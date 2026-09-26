@@ -105,6 +105,20 @@ export function repel(x: number, y: number, p: Pointer, radius: number, strength
   return [(dx / d) * f, (dy / d) * f];
 }
 
+/**
+ * Sideways parting for hanging strands, like fingers running through hair:
+ * smooth either side of the pointer, and carried on down the strand below it
+ * rather than dented in a circle. Returns the horizontal offset.
+ */
+export function comb(x: number, y: number, p: Pointer, reach = 110, strength = 36) {
+  if (p.force < 0.01) return 0;
+  const dx = x - p.x;
+  const dy = y - p.y;
+  const across = Math.exp(-(dx * dx) / (2 * reach * reach));
+  const along = dy > 0 ? Math.exp(-dy / (reach * 4)) : Math.exp(-(dy * dy) / (2 * reach * reach));
+  return Math.tanh(dx / (reach * 0.5)) * strength * across * along * p.force;
+}
+
 /** Adds a smooth (Catmull-Rom) curve through flat [x0, y0, x1, y1, …] points to the current path. */
 export function smoothPath(ctx: Ctx2D, pts: number[], count = pts.length / 2) {
   if (count < 2) return;

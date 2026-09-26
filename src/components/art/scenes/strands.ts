@@ -1,6 +1,6 @@
 /** Hair-strand scenes: the signature lock, a precision cut, balayage, a braid, a ringlet and a stray. */
 
-import { clamp, easeOut, repel, smoothPath, type Ctx2D, type SceneFactory } from "../core";
+import { clamp, comb, easeOut, smoothPath, type Ctx2D, type SceneFactory } from "../core";
 
 type Pt = [number, number];
 
@@ -14,7 +14,7 @@ function inkPick(rand: () => number, inks: string[]) {
 export const lock: SceneFactory = ({ opts, pal, rand }) => {
   const VW = 800;
   const VH = 1000;
-  const STEPS = 12;
+  const STEPS = 20;
   const count = Math.round((opts.count ?? 96) * opts.density);
   const goldCount = opts.accent ?? 5;
   const j = (n: number) => (rand() - 0.5) * n;
@@ -99,12 +99,9 @@ export const lock: SceneFactory = ({ opts, pal, rand }) => {
         const spread = 26 + 210 * Math.sin(Math.PI * Math.min(t, 0.92)) ** 0.8 + 90 * t;
         const wave = s.amp * Math.sin(2 * Math.PI * (waveFreq * t + s.phase - time * 0.11)) * (0.25 + 0.75 * t);
         const off = s.u * spread + wave;
-        let x = b.x + b.nx * off + px;
-        let y = b.y + b.ny * off + py;
-        const [rx, ry] = repel(x, y, p, 190, 1);
-        x += rx * 46 * (0.6 + s.depth * 0.8);
-        y += ry * 14 * (0.6 + s.depth * 0.8);
-        pts[k * 2] = x;
+        const x = b.x + b.nx * off + px;
+        const y = b.y + b.ny * off + py;
+        pts[k * 2] = x + comb(x, y, p, 120, 34) * (0.6 + s.depth * 0.6);
         pts[k * 2 + 1] = y;
       }
       ctx.beginPath();
@@ -146,7 +143,7 @@ export const cut: SceneFactory = ({ opts, pal, rand }) => {
     speed: 0.035 + rand() * 0.05,
     color: rand() < 0.2 ? pal.gold : pal.charcoal,
   }));
-  const STEPS = 9;
+  const STEPS = 14;
   const pts: number[] = new Array((STEPS + 1) * 2).fill(0);
 
   return ({ ctx, time, elapsed, intro, w, h, pointer }) => {
@@ -168,10 +165,8 @@ export const cut: SceneFactory = ({ opts, pal, rand }) => {
         let x = base + Math.sin(time * 0.6 + s.u * 5) * 5 * t * t + Math.sin(time * 1.2 + s.phase) * 1.1 * t;
         // Ends turn under slightly, like a blow-dried bob.
         x -= 7 * t ** 7;
-        let y = -12 + (end + 12) * t;
-        const [rx, ry] = repel(x, y, pointer, 130, 1);
-        x += rx * 34 * t;
-        y += ry * 8 * t;
+        const y = -12 + (end + 12) * t;
+        x += comb(x, y, pointer, 90, 26) * t;
         pts[k * 2] = x;
         pts[k * 2 + 1] = y;
       }
@@ -243,7 +238,7 @@ export const colour: SceneFactory = ({ opts, pal, rand }) => {
   let cachedH = -1;
   let gradBase: CanvasGradient | null = null;
   let gradLight: CanvasGradient | null = null;
-  const STEPS = 12;
+  const STEPS = 18;
   const pts: number[] = new Array((STEPS + 1) * 2).fill(0);
 
   return ({ ctx, time, elapsed, w, h, pointer }) => {
@@ -270,10 +265,8 @@ export const colour: SceneFactory = ({ opts, pal, rand }) => {
         const t = (k / STEPS) * grow;
         let x =
           s.u * w + s.lean * w * t + s.amp * Math.sin(2 * Math.PI * (s.freq * t + s.phase) - time * 0.45) * (0.3 + t);
-        let y = -20 + (h + 40) * t;
-        const [rx, ry] = repel(x, y, pointer, 150, 1);
-        x += rx * 40;
-        y += ry * 10;
+        const y = -20 + (h + 40) * t;
+        x += comb(x, y, pointer, 110, 30);
         pts[k * 2] = x;
         pts[k * 2 + 1] = y;
       }

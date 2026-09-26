@@ -18,6 +18,8 @@ export type ServiceCategory = {
   metaDescription: string;
   /** The living artwork shown in this service's hero. */
   scene: SceneName;
+  image: string;
+  imageAlt: string;
 };
 
 export const services: ServiceCategory[] = [
@@ -54,6 +56,8 @@ export const services: ServiceCategory[] = [
     metaDescription:
       "Precision haircuts, laser cuts, blow-dries and occasion styling at tressart salon, Ambalipura, Harlur Road, Bengaluru. Book a consultation with our stylists.",
     scene: "cut",
+    image: "/images/services/service-haircuts-styling.jpg",
+    imageAlt: "Precision haircut and blow-dry styling at tressart salon",
   },
   {
     slug: "hair-colour",
@@ -88,6 +92,8 @@ export const services: ServiceCategory[] = [
     metaDescription:
       "L'Oréal Professionnel hair colour at tressart salon, Harlur Road — global colour, root touch-ups, highlights, balayage and grey coverage by expert colourists.",
     scene: "colour",
+    image: "/images/services/service-hair-colour.jpg",
+    imageAlt: "L'Oréal Professionnel hair colour and dimensional balayage at tressart",
   },
   {
     slug: "hair-treatments",
@@ -125,6 +131,8 @@ export const services: ServiceCategory[] = [
     metaDescription:
       "Hair spa, keratin, smoothening, rebonding, scalp treatments and hair extensions at tressart salon, Ambalipura, Harlur Road, Bengaluru.",
     scene: "ripple",
+    image: "/images/services/service-hair-treatments.jpg",
+    imageAlt: "Restorative hair spa and nourishing treatment ritual at tressart",
   },
   {
     slug: "skin-facials",
@@ -159,6 +167,8 @@ export const services: ServiceCategory[] = [
     metaDescription:
       "Signature facials, clean-ups, de-tan, waxing and threading at tressart salon, Ambalipura, Harlur Road — professional skin care in a calm, hygienic setting.",
     scene: "glow",
+    image: "/images/services/service-skin-facials.jpg",
+    imageAlt: "Tailored facial massage and radiant skin ritual at tressart",
   },
   {
     slug: "bridal-makeup",
@@ -199,6 +209,8 @@ export const services: ServiceCategory[] = [
     metaDescription:
       "Bridal makeup, bridal hair styling, pre-bridal packages and party makeup at tressart salon, Harlur Road, Bengaluru. Plan your bridal look with us.",
     scene: "petals",
+    image: "/images/services/service-bridal-makeup.jpg",
+    imageAlt: "Luxury bridal makeup and bridal hair styling at tressart salon",
   },
   {
     slug: "nails",
@@ -231,6 +243,8 @@ export const services: ServiceCategory[] = [
     metaDescription:
       "Manicures, pedicures, spa pedicures, gel polish and nail art at tressart salon, Ambalipura, Harlur Road, Bengaluru.",
     scene: "fan",
+    image: "/images/services/service-nails.jpg",
+    imageAlt: "Manicure and gel polish nail care at tressart salon",
   },
   {
     slug: "mens-grooming",
@@ -264,6 +278,8 @@ export const services: ServiceCategory[] = [
     metaDescription:
       "Men's haircuts, beard design, shaves, grey blending and facials at tressart salon, a unisex salon on Harlur Road, Bengaluru.",
     scene: "fade",
+    image: "/images/services/service-mens-grooming.jpg",
+    imageAlt: "Men's tailored haircut and precision beard grooming at tressart",
   },
 ];
 

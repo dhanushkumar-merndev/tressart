@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { PageHero } from "@/components/sections/PageHero";
@@ -62,7 +63,21 @@ export default function ServicesPage() {
                 {s.title}
               </h2>
               <p className="mt-4 max-w-sm text-mute">{s.headline}</p>
-              <Link href={`/services/${s.slug}`} className="mt-8 inline-flex items-center gap-2 text-sm font-medium">
+              <Link
+                href={`/services/${s.slug}`}
+                className="group mt-6 block overflow-hidden rounded-[22px] border border-ink/10 bg-sand/30 shadow-[0_12px_30px_rgba(35,31,32,0.06)]"
+              >
+                <div className="relative aspect-[16/10] w-full overflow-hidden">
+                  <Image
+                    src={s.image}
+                    alt={s.imageAlt}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 33vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                </div>
+              </Link>
+              <Link href={`/services/${s.slug}`} className="mt-6 inline-flex items-center gap-2 text-sm font-medium">
                 <span className="link-line">More about {s.title.toLowerCase()}</span>
                 <ArrowRight className="size-4" />
               </Link>

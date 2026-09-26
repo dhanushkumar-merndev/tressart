@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { salonSchema, websiteSchema } from "@/lib/schema";
 import { site } from "@/lib/site";
+import { SmoothScroll } from "@/components/providers/SmoothScroll";
 import "./globals.css";
 
 const inter = Inter({
@@ -76,19 +77,21 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en-IN" className={inter.variable}>
       <body className="flex min-h-svh flex-col">
-        <a
-          href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-ink focus:px-5 focus:py-3 focus:text-sm focus:text-paper"
-        >
-          Skip to content
-        </a>
-        <JsonLd data={[salonSchema(), websiteSchema()]} />
-        <SiteHeader />
-        <main id="main" className="flex-1">
-          {children}
-        </main>
-        <SiteFooter />
-        <MobileCallBar />
+        <SmoothScroll>
+          <a
+            href="#main"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-ink focus:px-5 focus:py-3 focus:text-sm focus:text-paper"
+          >
+            Skip to content
+          </a>
+          <JsonLd data={[salonSchema(), websiteSchema()]} />
+          <SiteHeader />
+          <main id="main" className="flex-1">
+            {children}
+          </main>
+          <SiteFooter />
+          <MobileCallBar />
+        </SmoothScroll>
       </body>
     </html>
   );

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Tilt } from "@/components/art/Tilt";
 import { ArtCanvas } from "@/components/art/ArtCanvas";
 import { FaqList } from "@/components/sections/FaqList";
@@ -62,19 +63,33 @@ export default function HomePage() {
 
       {/* ------------------------------------------------------------ Hero */}
       <section aria-labelledby="hero-title" className="relative overflow-hidden pt-[var(--header-h)]">
+        {/* Animated line art background */}
         <ArtCanvas
           scene="lock"
           seed={7}
-          count={120}
+          count={80}
           accent={6}
           interactive
           fadeTop={0.22}
           label="Animated line artwork of a flowing lock of hair"
-          className="absolute -right-[30%] top-0 h-full w-[120%] opacity-50 sm:-right-[12%] sm:w-[80%] sm:opacity-80 lg:-right-[4%] lg:w-[58%] lg:opacity-100"
+          className="absolute -right-[20%] top-0 h-full w-[100%] opacity-20 sm:-right-[10%] sm:w-[70%] sm:opacity-30 lg:right-0 lg:w-[50%] lg:opacity-35"
         />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-paper via-paper/70 to-transparent lg:via-paper/30" />
 
-        <div className="container-x relative flex min-h-[calc(100svh-var(--header-h))] flex-col justify-center py-16 md:py-24">
+        {/* Real glossy hair centerpiece */}
+        <div className="pointer-events-none absolute -bottom-6 right-[-8%] top-16 flex w-[85%] max-w-[560px] items-end justify-end select-none sm:right-[2%] lg:right-[6%] lg:w-[46%] xl:max-w-[620px]">
+          <Image
+            src="/images/tressart-hair-hero.png"
+            alt="Glossy flowing balayage hair at tressart salon"
+            width={896}
+            height={1200}
+            priority
+            className="h-auto max-h-[82vh] w-auto max-w-full object-contain object-bottom drop-shadow-[0_24px_48px_rgba(35,31,32,0.12)]"
+          />
+        </div>
+
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-paper via-paper/85 to-transparent sm:via-paper/75 lg:via-paper/50 lg:w-[62%]" />
+
+        <div className="container-x relative z-10 flex min-h-[calc(100svh-var(--header-h))] flex-col justify-center py-16 md:py-24">
           <p className="rise eyebrow">
             L&apos;Oréal Professionnel flagship<span className="hidden sm:inline"> · Bengaluru</span>
           </p>
@@ -299,10 +314,17 @@ export default function HomePage() {
       <section aria-labelledby="bridal-title" className="bg-sand/30 py-28 md:py-40">
         <div className="container-x grid items-center gap-16 lg:grid-cols-12">
           <div className="reveal relative lg:col-span-5">
-            <Tilt className="aspect-[4/5] overflow-hidden rounded-[32px] bg-paper">
-              <ArtCanvas scene="petals" seed={53} interactive className="absolute inset-0 size-full" />
+            <Tilt className="aspect-[4/5] overflow-hidden rounded-[32px] bg-paper shadow-2xl relative">
+              <Image
+                src="/images/tressart-bridal.jpg"
+                alt="Bridal and occasion styling at tressart salon"
+                fill
+                sizes="(max-width: 1024px) 100vw, 40vw"
+                className="object-cover"
+              />
+              <ArtCanvas scene="petals" seed={53} interactive className="absolute inset-0 size-full opacity-40 mix-blend-screen" />
             </Tilt>
-            <p className="bracket-frame absolute -bottom-6 left-6 bg-paper px-8 py-3 text-sm italic text-charcoal md:left-10">
+            <p className="absolute -bottom-5 left-6 z-10 rounded-full border border-gold/40 bg-paper/95 px-7 py-3 text-sm italic text-charcoal shadow-[0_8px_24px_rgba(35,31,32,0.08)] backdrop-blur-sm md:left-10">
               {site.tagline}
             </p>
           </div>

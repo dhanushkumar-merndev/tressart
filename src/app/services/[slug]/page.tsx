@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Tilt } from "@/components/art/Tilt";
 import { CtaBand } from "@/components/sections/CtaBand";
@@ -62,7 +63,20 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
       <section aria-labelledby="menu-title" className="border-t border-ink/10 py-24 md:py-32">
         <div className="container-x grid gap-16 lg:grid-cols-12">
           <div className="lg:col-span-5">
-            <div className="lg:sticky lg:top-32">
+            <div className="lg:sticky lg:top-32 space-y-8">
+              <div className="reveal overflow-hidden rounded-[28px] border border-ink/10 bg-sand/30 shadow-[0_16px_40px_rgba(35,31,32,0.06)]">
+                <div className="relative aspect-[4/3] w-full overflow-hidden">
+                  <Image
+                    src={service.image}
+                    alt={service.imageAlt}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                    className="object-cover transition-transform duration-700 hover:scale-105"
+                    priority
+                  />
+                </div>
+              </div>
+
               <div className="reveal">
                 <Tilt className="overflow-hidden rounded-[32px] bg-ink p-8 text-paper md:p-10">
                   <p className="text-xs uppercase tracking-[0.24em] text-gold-pale">At a glance</p>

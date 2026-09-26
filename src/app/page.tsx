@@ -68,9 +68,8 @@ export default function HomePage() {
           count={120}
           accent={6}
           interactive
-          fadeTop={0.22}
           label="Animated line artwork of a flowing lock of hair"
-          className="absolute -right-[30%] top-0 h-full w-[120%] opacity-50 sm:-right-[12%] sm:w-[80%] sm:opacity-80 lg:-right-[4%] lg:w-[58%] lg:opacity-100"
+          className="absolute -right-[30%] top-0 h-full w-[120%] opacity-20 sm:-right-[12%] sm:w-[80%] sm:opacity-80 lg:-right-[4%] lg:w-[58%] lg:opacity-100"
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-paper via-paper/70 to-transparent lg:via-paper/30" />
 

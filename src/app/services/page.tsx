@@ -22,7 +22,7 @@ export default function ServicesPage() {
         eyebrow="The service menu"
         title="Hair, skin & bridal services."
         lead="Seven disciplines, one standard of care — for women and men, at our salon in Ambalipura on Harlur Road."
-        artSeed={29}
+        scene="braid"
       >
         <a href={site.phone.href} className="btn btn-dark">
           Book a consultation

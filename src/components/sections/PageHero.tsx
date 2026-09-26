@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { TressArt } from "@/components/art/TressArt";
+import { ArtCanvas } from "@/components/art/ArtCanvas";
+import type { SceneName } from "@/components/art/engine";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumbSchema } from "@/lib/schema";
 
@@ -11,22 +12,22 @@ type PageHeroProps = {
   title: ReactNode;
   lead?: ReactNode;
   crumbs: Crumb[];
-  artSeed?: number;
+  /** The living artwork for this page. */
+  scene: SceneName;
   children?: ReactNode;
 };
 
-export function PageHero({ eyebrow, title, lead, crumbs, artSeed = 3, children }: PageHeroProps) {
+export function PageHero({ eyebrow, title, lead, crumbs, scene, children }: PageHeroProps) {
   const trail = [{ name: "Home", path: "/" }, ...crumbs];
   return (
     <section className="relative overflow-hidden pt-[var(--header-h)]">
       <JsonLd data={breadcrumbSchema(trail)} />
-      <TressArt
-        seed={artSeed}
-        strands={90}
-        gold={5}
+      <ArtCanvas
+        scene={scene}
+        seed={scene.length * 13}
         interactive
         fadeTop={0.25}
-        className="absolute -right-[35%] top-0 h-full w-[110%] opacity-35 md:-right-[8%] md:w-[60%] md:opacity-70 lg:w-[50%] lg:opacity-100"
+        className="absolute inset-y-0 right-0 h-full w-full opacity-30 md:w-[64%] md:opacity-75 lg:w-[54%] lg:opacity-100"
       />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-paper via-paper/75 to-transparent" />
 

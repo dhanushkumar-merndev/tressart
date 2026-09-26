@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { TressArt } from "@/components/art/TressArt";
+import { ArtCanvas } from "@/components/art/ArtCanvas";
 import { Logo } from "@/components/brand/Logo";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { PageHero } from "@/components/sections/PageHero";
@@ -43,7 +43,7 @@ export default function AboutPage() {
         eyebrow="About tressart"
         title="Hair, and the art of it."
         lead="tressart salon is a L'Oréal Professionnel flagship salon in Ambalipura, on Harlur Road, Bengaluru — a unisex salon for hair, skin, nails and bridal."
-        artSeed={61}
+        scene="curl"
       />
 
       {/* Story */}
@@ -78,12 +78,11 @@ export default function AboutPage() {
 
       {/* Principles */}
       <section aria-labelledby="principles-title" className="relative overflow-hidden bg-ink py-24 text-paper md:py-36">
-        <TressArt
+        <ArtCanvas
+          scene="silk"
           seed={83}
-          strands={70}
-          gold={4}
           tone="light"
-          className="pointer-events-none absolute -right-40 top-0 h-full w-[70%] opacity-25 lg:w-[45%]"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-[65%] w-full opacity-35"
         />
         <div className="container-x relative">
           <SectionHeading

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { TressArt } from "@/components/art/TressArt";
+import { ArtCanvas } from "@/components/art/ArtCanvas";
 
 export const metadata: Metadata = {
   title: "Page not found",
@@ -10,12 +10,11 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <section className="relative flex min-h-svh items-center overflow-hidden pt-[var(--header-h)]">
-      <TressArt
+      <ArtCanvas
+        scene="stray"
         seed={404}
-        strands={80}
-        gold={3}
         interactive
-        className="absolute -right-[20%] top-0 h-full w-[90%] opacity-40 md:w-[55%] md:opacity-80"
+        className="absolute inset-y-0 right-0 h-full w-full opacity-35 md:w-[55%] md:opacity-90"
       />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-paper via-paper/70 to-transparent" />
       <div className="container-x relative py-24">

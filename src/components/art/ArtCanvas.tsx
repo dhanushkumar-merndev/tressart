@@ -1,35 +1,30 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import {
-  buildLock,
-  createRenderer,
-  type LockOptions,
-  type RendererOptions,
-  type Tone,
-  type View,
-} from "./tress-engine";
+import { createRenderer, type SceneName, type SceneOptions, type Tone, type View } from "./engine";
 
 /**
- * Living generative artwork: a lock of hair drawn as fine strands that draw
- * themselves in, flow in a slow breeze, drift in depth with the pointer and,
- * when `interactive`, part around the cursor.
+ * Living generative artwork. Every page has its own scene — the signature lock
+ * of hair on the home page, a braid on the services menu, a precision cut,
+ * balayage, ripples, petals and more — see `./scenes`.
  *
  * Rendering happens in a Web Worker through OffscreenCanvas wherever it's
  * supported, so the animation never occupies the main thread. It only runs
  * while on screen, and renders a single still frame for reduced-motion users.
  */
 
-type TressArtProps = {
+type ArtCanvasProps = {
+  scene: SceneName;
   seed?: number;
-  strands?: number;
-  gold?: number;
   tone?: Tone;
+  /** Scene-specific element and accent counts (used by the lock). */
+  count?: number;
+  accent?: number;
   /** "flow" animates continuously; "still" renders one frame. */
   motion?: "flow" | "still";
-  /** Strands part around the pointer (fine pointers only). */
+  /** Responds to the pointer (fine pointers only). */
   interactive?: boolean;
-  /** Draw the strands in when the artwork first comes into view. */
+  /** Play the entrance when the artwork first comes into view. */
   drawIn?: boolean;
   /** Fraction of the height to fade out at the top edge. */
   fadeTop?: number;
@@ -38,7 +33,7 @@ type TressArtProps = {
   label?: string;
 };
 
-type Config = { lock: LockOptions; options: RendererOptions; view: View };
+type Config = { opts: SceneOptions; view: View };
 
 type Transport = {
   configure(config: Config): void;
@@ -53,7 +48,7 @@ function workerTransport(canvas: HTMLCanvasElement, config: Config): Transport |
   if (typeof Worker === "undefined" || !("transferControlToOffscreen" in canvas)) return null;
   try {
     const offscreen = canvas.transferControlToOffscreen();
-    const worker = new Worker(new URL("./tress.worker.ts", import.meta.url), { type: "module" });
+    const worker = new Worker(new URL("./art.worker.ts", import.meta.url), { type: "module" });
     worker.postMessage({ type: "init", canvas: offscreen, ...config }, [offscreen]);
     return {
       configure: (c) => worker.postMessage({ type: "config", ...c }),
@@ -70,7 +65,7 @@ function mainThreadTransport(canvas: HTMLCanvasElement, initial: Config): Transp
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
   let config = initial;
-  let renderer = createRenderer(ctx, buildLock(config.lock), config.view, config.options);
+  let renderer = createRenderer(ctx, config.opts, config.view);
   let raf = 0;
   let last = 0;
 
@@ -87,24 +82,24 @@ function mainThreadTransport(canvas: HTMLCanvasElement, initial: Config): Transp
   };
 
   applySize();
-  if (!config.options.animated) renderer.frame(0);
+  if (!config.opts.animated) renderer.frame(0);
 
   return {
     configure(c) {
       config = c;
-      renderer = createRenderer(ctx, buildLock(c.lock), c.view, c.options);
+      renderer = createRenderer(ctx, c.opts, c.view);
       applySize();
-      if (!c.options.animated) renderer.frame(0);
+      if (!c.opts.animated) renderer.frame(0);
     },
     setView(view) {
       Object.assign(config.view, view);
       if (view.width !== undefined || view.height !== undefined || view.dpr !== undefined) {
         applySize();
-        if (!config.options.animated) renderer.frame(0);
+        if (!config.opts.animated) renderer.frame(0);
       }
     },
     setRunning(running) {
-      if (running && config.options.animated && !raf) raf = requestAnimationFrame(loop);
+      if (running && config.opts.animated && !raf) raf = requestAnimationFrame(loop);
       if (!running && raf) {
         cancelAnimationFrame(raf);
         raf = 0;
@@ -121,18 +116,19 @@ function mainThreadTransport(canvas: HTMLCanvasElement, initial: Config): Transp
 // and are picked up again if the same canvas re-mounts.
 const transports = new WeakMap<HTMLCanvasElement, { transport: Transport; kill?: ReturnType<typeof setTimeout> }>();
 
-export function TressArt({
+export function ArtCanvas({
+  scene,
   seed = 7,
-  strands = 96,
-  gold = 5,
   tone = "dark",
+  count,
+  accent,
   motion = "flow",
   interactive = false,
   drawIn = true,
   fadeTop = 0,
   className,
   label,
-}: TressArtProps) {
+}: ArtCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -146,9 +142,18 @@ export function TressArt({
     const small = rect.width < 640;
 
     const config: Config = {
-      // Fewer strands on small canvases keeps phones light.
-      lock: { seed, strands: small ? Math.round(strands * 0.7) : strands, gold, tone },
-      options: { animated, drawIn, interactive: animated && interactive && finePointer },
+      opts: {
+        scene,
+        seed,
+        tone,
+        count,
+        accent,
+        // Fewer elements on small canvases keeps phones light.
+        density: small ? 0.7 : 1,
+        animated,
+        drawIn,
+        interactive: animated && interactive && finePointer,
+      },
       view: {
         width: rect.width,
         height: rect.height,
@@ -200,7 +205,7 @@ export function TressArt({
       });
     };
     const onLeave = () => transport.setView({ pointerInside: false });
-    if (config.options.interactive) {
+    if (config.opts.interactive) {
       window.addEventListener("pointermove", onPointer, { passive: true });
       document.documentElement.addEventListener("pointerleave", onLeave);
     }
@@ -220,7 +225,7 @@ export function TressArt({
         }, 0);
       }
     };
-  }, [seed, strands, gold, tone, motion, interactive, drawIn, fadeTop]);
+  }, [scene, seed, tone, count, accent, motion, interactive, drawIn, fadeTop]);
 
   return (
     <canvas

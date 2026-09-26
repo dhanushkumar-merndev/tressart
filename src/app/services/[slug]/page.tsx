@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Tilt } from "@/components/art/Tilt";
-import { TressArt } from "@/components/art/TressArt";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { FaqList } from "@/components/sections/FaqList";
 import { PageHero } from "@/components/sections/PageHero";
 import { SectionHeading } from "@/components/sections/SectionHeading";
 import { ServicesGrid } from "@/components/sections/ServicesGrid";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { ArrowUpRight } from "@/components/ui/icons";
+import { ArrowUpRight, Phone } from "@/components/ui/icons";
 import { pageMetadata } from "@/lib/metadata";
 import { faqSchema, serviceSchema } from "@/lib/schema";
 import { getService, services } from "@/lib/services";
@@ -49,7 +48,7 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
         eyebrow={`Service ${service.number} · Bengaluru`}
         title={service.title}
         lead={`${service.headline} ${service.summary}`}
-        artSeed={service.artSeed}
+        scene={service.scene}
       >
         <a href={site.phone.href} className="btn btn-dark">
           Book an appointment
@@ -65,14 +64,33 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
           <div className="lg:col-span-5">
             <div className="lg:sticky lg:top-32">
               <div className="reveal">
-                <Tilt className="aspect-[4/5] overflow-hidden rounded-[32px] bg-sand/30">
-                  <TressArt
-                    seed={service.artSeed + 1}
-                    strands={80}
-                    gold={service.slug === "hair-colour" || service.slug === "bridal-makeup" ? 16 : 5}
-                    interactive
-                    className="absolute inset-0 size-full"
-                  />
+                <Tilt className="overflow-hidden rounded-[32px] bg-ink p-8 text-paper md:p-10">
+                  <p className="text-xs uppercase tracking-[0.24em] text-gold-pale">At a glance</p>
+                  <p className="mt-6 text-[clamp(1.6rem,2.4vw,2.1rem)] font-light leading-tight tracking-tight">
+                    {service.headline}
+                  </p>
+                  <p className="mt-10 text-xs uppercase tracking-[0.2em] text-paper/60">Most requested</p>
+                  <ul className="mt-4 divide-y divide-paper/15 border-y border-paper/15">
+                    {service.highlights.map((item) => (
+                      <li key={item} className="flex items-center gap-3 py-3.5">
+                        <span aria-hidden="true" className="size-1.5 rounded-full bg-gold-pale" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <dl className="mt-8 grid grid-cols-2 gap-6 text-sm">
+                    <div>
+                      <dt className="text-paper/60">Treatments</dt>
+                      <dd className="mt-1 text-2xl font-light">{service.items.length}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-paper/60">{site.hours.label}</dt>
+                      <dd className="mt-1 text-lg font-light">{site.hours.time}</dd>
+                    </div>
+                  </dl>
+                  <a href={site.phone.href} className="btn btn-light mt-8 w-full">
+                    <Phone className="size-4" /> {site.phone.display}
+                  </a>
                 </Tilt>
               </div>
             </div>

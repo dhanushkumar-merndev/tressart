@@ -1,4 +1,4 @@
-import { TressArt } from "@/components/art/TressArt";
+import { ArtCanvas } from "@/components/art/ArtCanvas";
 import { ArrowUpRight, Phone } from "@/components/ui/icons";
 import { site } from "@/lib/site";
 
@@ -10,12 +10,11 @@ export function CtaBand({
 }: CtaBandProps) {
   return (
     <section aria-label="Book an appointment" className="relative overflow-hidden bg-charcoal text-paper">
-      <TressArt
+      <ArtCanvas
+        scene="dust"
         seed={101}
-        strands={70}
-        gold={4}
         tone="light"
-        className="pointer-events-none absolute -right-24 top-1/2 h-[180%] w-[70%] -translate-y-1/2 opacity-45 md:right-0 md:w-[45%]"
+        className="pointer-events-none absolute inset-0 size-full opacity-80"
       />
       <div className="container-x relative py-24 md:py-32">
         <p className="reveal eyebrow !text-paper/60">Appointments</p>

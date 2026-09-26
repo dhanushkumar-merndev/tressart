@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ArtCanvas } from "@/components/art/ArtCanvas";
 import { VisitSection } from "@/components/sections/VisitSection";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Facebook, Instagram } from "@/components/ui/icons";
@@ -41,8 +42,18 @@ export default function ContactPage() {
         <VisitSection headingLevel="h1" />
       </div>
 
-      <section aria-labelledby="tips-title" className="border-t border-ink/10 bg-sand/20 py-24 md:py-32">
-        <div className="container-x">
+      <section
+        aria-labelledby="tips-title"
+        className="relative overflow-hidden border-t border-ink/10 bg-sand/20 py-24 md:py-32"
+      >
+        <ArtCanvas
+          scene="contour"
+          seed={560102}
+          interactive
+          className="pointer-events-none absolute inset-y-0 right-0 h-full w-full opacity-45 md:w-[70%]"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#f1ece5] via-[#f1ece5]/70 to-transparent" />
+        <div className="container-x relative">
           <h2 id="tips-title" className="reveal eyebrow">
             Before you visit
           </h2>

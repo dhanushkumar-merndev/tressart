@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Tilt } from "@/components/art/Tilt";
-import { TressArt } from "@/components/art/TressArt";
+import { ArtCanvas } from "@/components/art/ArtCanvas";
 import { FaqList } from "@/components/sections/FaqList";
 import { SectionHeading } from "@/components/sections/SectionHeading";
 import { ServicesGrid } from "@/components/sections/ServicesGrid";
@@ -62,10 +62,11 @@ export default function HomePage() {
 
       {/* ------------------------------------------------------------ Hero */}
       <section aria-labelledby="hero-title" className="relative overflow-hidden pt-[var(--header-h)]">
-        <TressArt
+        <ArtCanvas
+          scene="lock"
           seed={7}
-          strands={120}
-          gold={6}
+          count={120}
+          accent={6}
           interactive
           fadeTop={0.22}
           label="Animated line artwork of a flowing lock of hair"
@@ -204,12 +205,11 @@ export default function HomePage() {
 
       {/* ------------------------------------------------------ Experience */}
       <section aria-labelledby="experience-title" className="relative overflow-hidden bg-ink py-28 text-paper md:py-40">
-        <TressArt
+        <ArtCanvas
+          scene="silk"
           seed={19}
-          strands={80}
-          gold={4}
           tone="light"
-          className="pointer-events-none absolute -left-40 top-0 h-full w-[70%] opacity-25 lg:w-[45%]"
+          className="pointer-events-none absolute inset-x-0 top-0 h-[70%] w-full opacity-40"
         />
         <div className="container-x relative">
           <p className="reveal eyebrow !text-paper/60">The tressart experience</p>
@@ -300,7 +300,7 @@ export default function HomePage() {
         <div className="container-x grid items-center gap-16 lg:grid-cols-12">
           <div className="reveal relative lg:col-span-5">
             <Tilt className="aspect-[4/5] overflow-hidden rounded-[32px] bg-paper">
-              <TressArt seed={53} strands={90} gold={14} interactive className="absolute inset-0 size-full" />
+              <ArtCanvas scene="petals" seed={53} interactive className="absolute inset-0 size-full" />
             </Tilt>
             <p className="bracket-frame absolute -bottom-6 left-6 bg-paper px-8 py-3 text-sm italic text-charcoal md:left-10">
               {site.tagline}

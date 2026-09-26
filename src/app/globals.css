@@ -1,0 +1,305 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   tressart brand tokens — from Brand Standards v1.0, section 03 Colour system.
+   Predominantly monochrome; warm neutrals support; gold is a restrained accent.
+--------------------------------------------------------------------------- */
+@theme inline {
+  --color-ink: #231f20; /* Tressart Black — primary logo / type */
+  --color-charcoal: #33302f; /* Charcoal — body / dark fields */
+  --color-paper: #f7f5f1; /* Warm White — background */
+  --color-studio: #ffffff; /* Studio White — clean background */
+  --color-grey: #7d7d7d; /* Tressart Grey — secondary type (large sizes) */
+  --color-mute: #5f5b59; /* Tressart Grey, deepened for small text contrast */
+  --color-soft: #e9e6e2; /* Soft Grey — rules / panels */
+  --color-sand: #d8c7b2; /* Warm Sand — boho support */
+  --color-taupe: #a99a8b; /* Taupe — boho support */
+  --color-rose: #b7a09a; /* Dusty Rose — optional warmth */
+  --color-olive: #8d8a72; /* Muted Olive — optional organic accent */
+  --color-gold: #b08a57; /* Tressart Gold — premium accent */
+  --color-gold-pale: #d9c09a; /* Pale Gold — soft accent */
+
+  /* Helvetica family is mandated. Apple devices get Helvetica Neue; elsewhere
+     Inter stands in as the closest neutral grotesque with a full weight range. */
+  --font-sans: "Helvetica Neue", Helvetica, var(--font-inter), Arial, sans-serif;
+
+  --text-display: clamp(3.1rem, 8.4vw, 8.25rem);
+  --text-display--line-height: 0.94;
+  --text-display--letter-spacing: -0.035em;
+  --text-headline: clamp(2.2rem, 4.8vw, 4.25rem);
+  --text-headline--line-height: 1.02;
+  --text-headline--letter-spacing: -0.03em;
+  --text-lead: clamp(1.1rem, 1.5vw, 1.3rem);
+  --text-lead--line-height: 1.6;
+
+  --ease-silk: cubic-bezier(0.6, 0.1, 0.2, 1);
+}
+
+:root {
+  color-scheme: light;
+  --header-h: 76px;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-h) + 16px);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "kern", "liga";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-sand);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 1.5px solid var(--color-gold);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Components
+--------------------------------------------------------------------------- */
+@layer components {
+  /* Solid by default; fades in from transparent on scroll where supported. */
+  .site-header {
+    background-color: rgb(247 245 241 / 0.92);
+    border-bottom: 1px solid var(--color-soft);
+    backdrop-filter: saturate(1.2) blur(14px);
+  }
+
+  .container-x {
+    width: 100%;
+    max-width: 1320px;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 768px) {
+    .container-x {
+      padding-inline: 2.5rem;
+    }
+  }
+
+  /* Captions — Helvetica Regular with increased tracking. */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--color-mute);
+  }
+  .eyebrow::before {
+    content: "";
+    width: 2rem;
+    height: 1px;
+    background: var(--color-gold);
+  }
+  .eyebrow-plain::before {
+    display: none;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    min-height: 3.25rem;
+    padding: 0 1.75rem;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    border-radius: 999px;
+    transition:
+      background-color 0.35s var(--ease-silk),
+      color 0.35s var(--ease-silk),
+      border-color 0.35s var(--ease-silk);
+  }
+  .btn-dark {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+  .btn-dark:hover {
+    background: var(--color-charcoal);
+  }
+  .btn-outline {
+    border: 1px solid color-mix(in srgb, var(--color-ink) 30%, transparent);
+    color: var(--color-ink);
+  }
+  .btn-outline:hover {
+    border-color: var(--color-ink);
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+  .btn-light {
+    background: var(--color-paper);
+    color: var(--color-ink);
+  }
+  .btn-light:hover {
+    background: var(--color-gold-pale);
+  }
+  .btn-ghost-light {
+    border: 1px solid rgb(255 255 255 / 0.3);
+    color: var(--color-paper);
+  }
+  .btn-ghost-light:hover {
+    border-color: var(--color-paper);
+  }
+
+  /* Button groups: full-width stacked buttons on phones, inline from 640px. */
+  .btn-row {
+    display: grid;
+    gap: 0.75rem;
+  }
+  @media (min-width: 640px) {
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+  }
+
+  /* Soft light that follows the pointer across tilted panels. */
+  .tilt-glare {
+    background: radial-gradient(
+      circle at var(--glare-x, 50%) var(--glare-y, 50%),
+      rgb(255 255 255 / 0.35),
+      transparent 55%
+    );
+    opacity: var(--glare-o, 0);
+    transition: opacity 0.5s var(--ease-silk);
+    mix-blend-mode: soft-light;
+  }
+
+  /* Text link with a hairline that draws in on hover. */
+  .link-line {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.5s var(--ease-silk);
+    padding-bottom: 2px;
+  }
+  .link-line:hover,
+  .link-line:focus-visible {
+    background-size: 100% 1px;
+  }
+
+  /* Bracket-inspired framing device (thin, secondary — never the logo symbol). */
+  .bracket-frame {
+    position: relative;
+  }
+  .bracket-frame::before,
+  .bracket-frame::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 14px;
+    border: 1px solid var(--color-gold);
+    pointer-events: none;
+  }
+  .bracket-frame::before {
+    left: 0;
+    border-right: 0;
+    border-radius: 14px 0 0 14px;
+  }
+  .bracket-frame::after {
+    right: 0;
+    border-left: 0;
+    border-radius: 0 14px 14px 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Motion — CSS only. Content is always visible where these aren't supported.
+--------------------------------------------------------------------------- */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes header-solid {
+  from {
+    background-color: rgb(247 245 241 / 0);
+    border-bottom-color: transparent;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .rise {
+    animation: rise 1.1s var(--ease-silk) both;
+  }
+  .rise-1 {
+    animation-delay: 0.08s;
+  }
+  .rise-2 {
+    animation-delay: 0.18s;
+  }
+  .rise-3 {
+    animation-delay: 0.3s;
+  }
+  .rise-4 {
+    animation-delay: 0.44s;
+  }
+
+  .marquee-track {
+    animation: marquee 48s linear infinite;
+  }
+
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .site-header {
+      animation: header-solid linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 140px;
+    }
+  }
+}
+
+/* Accordion marker */
+details > summary {
+  list-style: none;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+details[open] .faq-icon {
+  transform: rotate(45deg);
+}

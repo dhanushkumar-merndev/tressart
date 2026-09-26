@@ -1,236 +1,139 @@
 /** Hair-strand scenes: the signature lock, a precision cut, balayage, a braid, a ringlet and a stray. */
 
-import { clamp, comb, easeOut, smoothPath, type Ctx2D, type Palette, type SceneFactory } from "../core";
+import { clamp, comb, easeOut, smoothPath, type Ctx2D, type SceneFactory } from "../core";
+
+type Pt = [number, number];
 
 function inkPick(rand: () => number, inks: string[]) {
   return inks[Math.floor(rand() ** 1.8 * inks.length)];
 }
 
 // ---------------------------------------------------------------------------
-// Realistic hair rendering, shared by the lock, cut and colour scenes.
-// Hair reads as hair when strands clump into locks, sit on a soft mass of
-// colour, catch light in a band, and thin out into separated ends.
+// lock — the home page's signature: a lock of hair flowing along an S-curve.
 // ---------------------------------------------------------------------------
-
-type Shades = [CanvasGradient, CanvasGradient, CanvasGradient];
-
-/** Gaussian-ish random in roughly -1…1. */
-const gauss = (rand: () => number) => (rand() + rand() + rand() - 1.5) / 1.5;
-
-/** Vertical gradients for back, middle and front strands, with a shine band at `band` (0…1 of y0→y1). */
-function hairShades(ctx: Ctx2D, pal: Palette, y0: number, y1: number, band: number, ends = pal.gold): Shades {
-  const mk = (stops: [number, string][]) => {
-    const g = ctx.createLinearGradient(0, y0, 0, y1);
-    for (const [o, c] of stops) g.addColorStop(clamp(o), c);
-    return g;
-  };
-  const b = band;
-  return [
-    mk([
-      [0, pal.ink],
-      [b - 0.06, pal.ink],
-      [b, pal.charcoal],
-      [b + 0.08, pal.ink],
-      [0.85, pal.ink],
-      [1, pal.charcoal],
-    ]),
-    mk([
-      [0, pal.ink],
-      [b - 0.09, pal.charcoal],
-      [b - 0.01, pal.taupe],
-      [b + 0.09, pal.charcoal],
-      [0.8, pal.charcoal],
-      [1, pal.taupe],
-    ]),
-    mk([
-      [0, pal.charcoal],
-      [b - 0.09, pal.taupe],
-      [b - 0.025, pal.goldPale],
-      [b + 0.025, pal.goldPale],
-      [b + 0.1, pal.taupe],
-      [b + 0.2, pal.charcoal],
-      [0.86, pal.charcoal],
-      [1, ends],
-    ]),
-  ];
-}
-
-/** Strokes a strand through flat points: full body, then a thinner, fainter tip. */
-function strokeStrand(ctx: Ctx2D, pts: number[], count: number, width: number, alpha: number) {
-  const tipFrom = Math.max(1, count - 4);
-  ctx.beginPath();
-  smoothPath(ctx, pts, tipFrom + 1);
-  ctx.globalAlpha = alpha;
-  ctx.lineWidth = width;
-  ctx.stroke();
-  ctx.beginPath();
-  smoothPath(ctx, pts.slice(tipFrom * 2, count * 2), count - tipFrom);
-  ctx.globalAlpha = alpha * 0.55;
-  ctx.lineWidth = width * 0.45;
-  ctx.stroke();
-}
-
-// ---------------------------------------------------------------------------
-// lock — the home page's signature: long, straight, glossy dark hair seen from
-// behind. A dense mass of fine strands with streaks of shine and ragged ends.
-// ---------------------------------------------------------------------------
-export const lock: SceneFactory = ({ opts, rand }) => {
+export const lock: SceneFactory = ({ opts, pal, rand }) => {
   const VW = 800;
   const VH = 1000;
-  const STEPS = 22;
-  const n = (k: number) => Math.round(k * opts.density);
-  const dark = Array.from({ length: n(560) }, () => ({
-    u: rand() * 2 - 1,
-    len: 0.9 + rand() * 0.12,
-    ph: rand() * 6.28,
-    a: rand(),
-  }));
-  const gloss = Array.from({ length: n(320) }, () => ({
-    u: clamp(gauss(rand) * 0.85, -0.95, 0.95),
-    len: 0.5 + rand() * 0.48,
-    ph: rand() * 6.28,
-    a: rand(),
-  }));
-  const fly = Array.from({ length: 10 }, () => ({
-    u: rand() < 0.5 ? -1.0 - rand() * 0.04 : 1.0 + rand() * 0.04,
-    ph: rand() * 6.28,
-    len: 0.35 + rand() * 0.5,
-    amp: 6 + rand() * 12,
-  }));
-  const EDGE = 48;
-  const ragged = Array.from({ length: EDGE + 1 }, () => 0.9 + rand() * 0.1);
-  const endAt = (u: number) => ragged[Math.round(((clamp(u, -1, 1) + 1) / 2) * EDGE)];
+  const STEPS = 20;
+  const count = Math.round((opts.count ?? 96) * opts.density);
+  const goldCount = opts.accent ?? 5;
+  const j = (n: number) => (rand() - 0.5) * n;
+  const spine0: Pt[] = [
+    [470 + j(60), -60],
+    [700 + j(80), 260 + j(60)],
+    [130 + j(80), 600 + j(60)],
+    [430 + j(80), 1080],
+  ];
+  const waveFreq = 1.4 + rand() * 0.6;
+  const wavePhase = rand();
+  const golds = new Set<number>();
+  while (golds.size < Math.min(goldCount, count)) golds.add(Math.floor(rand() * count));
+  const inks = [pal.ink, pal.charcoal, pal.grey, pal.taupe];
+
+  const strands = Array.from({ length: count }, (_, i) => {
+    const r = count > 1 ? (i / (count - 1)) * 2 - 1 : 0;
+    const isGold = golds.has(i);
+    const depth = rand();
+    return {
+      u: Math.sign(r) * Math.abs(r) ** 1.25 + j(0.06),
+      phase: wavePhase + j(0.14),
+      amp: 16 + rand() * 18,
+      tStart: rand() * 0.06,
+      tEnd: 0.8 + rand() * 0.2,
+      color: isGold ? pal.gold : inkPick(rand, inks),
+      width: isGold ? 1.3 + rand() * 0.6 : 0.4 + depth * 0.8 + rand() * 0.3,
+      alpha: isGold ? 0.95 : 0.2 + depth * 0.45 + rand() * 0.15,
+      depth,
+      delay: (i / count) * 1.1 + rand() * 0.25,
+    };
+  });
+
+  const bez = (p: Pt[], t: number) => {
+    const [p0, p1, p2, p3] = p;
+    const mt = 1 - t;
+    const a = mt * mt * mt;
+    const b = 3 * mt * mt * t;
+    const c = 3 * mt * t * t;
+    const d = t * t * t;
+    const dx = 3 * mt * mt * (p1[0] - p0[0]) + 6 * mt * t * (p2[0] - p1[0]) + 3 * t * t * (p3[0] - p2[0]);
+    const dy = 3 * mt * mt * (p1[1] - p0[1]) + 6 * mt * t * (p2[1] - p1[1]) + 3 * t * t * (p3[1] - p2[1]);
+    const len = Math.hypot(dx, dy) || 1;
+    return {
+      x: a * p0[0] + b * p1[0] + c * p2[0] + d * p3[0],
+      y: a * p0[1] + b * p1[1] + c * p2[1] + d * p3[1],
+      nx: -dy / len,
+      ny: dx / len,
+    };
+  };
+  const pts: number[] = new Array((STEPS + 1) * 2).fill(0);
 
   return ({ ctx, time, elapsed, w, h, dpr, pointer }) => {
     const scale = Math.max(w / VW, h / VH);
     const offX = (w - VW * scale) / 2;
     const offY = (h - VH * scale) / 2;
     ctx.setTransform(dpr * scale, 0, 0, dpr * scale, dpr * offX, dpr * offY);
+    // Pointer in artwork units.
     const p = { ...pointer, x: (pointer.x - offX) / scale, y: (pointer.y - offY) / scale };
 
-    const grow = opts.animated && opts.drawIn ? easeOut(elapsed / 2.2) : 1;
-    const cx = 440;
-    const top = 120;
-    const length = 920 * grow;
-    // Rounded crown, then a straight fall that widens a little towards the ends.
-    const half = (t: number) => 8 + 187 * Math.sqrt(Math.min(t, 0.18) / 0.18) + 55 * Math.max(0, t - 0.18);
-    const sway = (t: number) => Math.sin(time * 0.5) * 7 * t * t + Math.sin(time * 0.8 + 1) * 3 * t;
-    const X = (u: number, t: number, ph: number) =>
-      cx + u * half(t) * (1 + 0.015 * Math.sin(t * 9 + ph)) + sway(t) + pointer.nx * 10 * t;
-    const Y = (t: number) => top + length * t;
+    const sway = Math.sin(time * 0.32) * 18;
+    const lift = Math.sin(time * 0.21 + 1.3) * 10;
+    const spine: Pt[] = [
+      spine0[0],
+      [spine0[1][0] + sway, spine0[1][1] + lift],
+      [spine0[2][0] - sway * 0.8, spine0[2][1] - lift],
+      [spine0[3][0] + sway * 1.4, spine0[3][1]],
+    ];
 
-    // 1. The body of the hair: a filled dark mass, deeper at the edges.
-    const body = ctx.createLinearGradient(cx - 260, 0, cx + 260, 0);
-    body.addColorStop(0, "#0d0a0a");
-    body.addColorStop(0.5, "#282223");
-    body.addColorStop(1, "#0d0a0a");
-    ctx.beginPath();
-    // Sample densely near the crown, where the outline curves most.
-    for (let k = 0; k <= 48; k++) {
-      const t = (k / 48) ** 2 * endAt(-1);
-      ctx.lineTo(X(-1, t, 0), Y(t));
-    }
-    for (let e = 0; e <= EDGE; e++) {
-      const u = (e / EDGE) * 2 - 1;
-      const t = ragged[e] * 0.97;
-      ctx.lineTo(X(u, t, 0), Y(t));
-    }
-    for (let k = 48; k >= 0; k--) {
-      const t = (k / 48) ** 2 * endAt(1);
-      ctx.lineTo(X(1, t, 0), Y(t));
-    }
-    ctx.closePath();
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = body;
-    ctx.fill();
-
-    const strand = (u: number, len: number, ph: number, from = 0) => {
-      for (let k = 0; k <= STEPS; k++) {
-        const t = from + (len - from) * (k / STEPS) ** 1.6;
-        const x = X(u, t, ph);
-        const y = Y(t);
-        const px = x + comb(x, y, p, 110, 30) * Math.min(1, t * 3);
-        if (k === 0) ctx.moveTo(px, y);
-        else ctx.lineTo(px, y);
+    for (const s of strands) {
+      let grow = 1;
+      if (opts.animated && opts.drawIn) {
+        grow = clamp((elapsed - s.delay) / 1.6);
+        if (grow <= 0) continue;
+        grow = easeOut(grow);
       }
-    };
-
-    // 2. Fine dark strands give the mass its texture and ragged ends.
-    ctx.strokeStyle = "#0a0808";
-    ctx.lineWidth = 0.7 / scale;
-    for (const [lo, hi, a] of [
-      [0, 0.5, 0.35],
-      [0.5, 1, 0.6],
-    ] as const) {
+      const px = pointer.nx * (s.depth - 0.4) * 34;
+      const py = pointer.ny * (s.depth - 0.4) * 16;
+      for (let k = 0; k <= STEPS; k++) {
+        const t = s.tStart + ((s.tEnd - s.tStart) * k * grow) / STEPS;
+        const b = bez(spine, t);
+        const spread = 26 + 210 * Math.sin(Math.PI * Math.min(t, 0.92)) ** 0.8 + 90 * t;
+        const wave = s.amp * Math.sin(2 * Math.PI * (waveFreq * t + s.phase - time * 0.11)) * (0.25 + 0.75 * t);
+        const off = s.u * spread + wave;
+        const x = b.x + b.nx * off + px;
+        const y = b.y + b.ny * off + py;
+        pts[k * 2] = x + comb(x, y, p, 120, 34) * (0.6 + s.depth * 0.6);
+        pts[k * 2 + 1] = y;
+      }
       ctx.beginPath();
-      for (const s of dark) if (s.a >= lo && s.a < hi) strand(s.u, s.len * endAt(s.u) * 1.03, s.ph);
-      ctx.globalAlpha = a;
+      smoothPath(ctx, pts);
+      ctx.strokeStyle = s.color;
+      ctx.globalAlpha = s.alpha;
+      ctx.lineWidth = s.width / scale;
       ctx.stroke();
     }
-
-    // 3. Gloss: soft light streaks, brightest near the crown and fading down the length.
-    const shine = ctx.createLinearGradient(0, top, 0, top + 920);
-    shine.addColorStop(0, "rgba(236,230,222,0)");
-    shine.addColorStop(0.07, "rgba(236,230,222,0.15)");
-    shine.addColorStop(0.2, "rgba(240,234,226,0.75)");
-    shine.addColorStop(0.38, "rgba(205,196,186,0.55)");
-    shine.addColorStop(0.65, "rgba(160,150,144,0.28)");
-    shine.addColorStop(1, "rgba(130,120,115,0.08)");
-    ctx.strokeStyle = shine;
-    for (const [lo, hi, a, lw] of [
-      [0, 0.45, 0.18, 0.6],
-      [0.45, 0.8, 0.32, 0.8],
-      [0.8, 1, 0.55, 1.1],
-    ] as const) {
-      ctx.beginPath();
-      for (const s of gloss) if (s.a >= lo && s.a < hi) strand(s.u, s.len * endAt(s.u) * 0.9, s.ph, 0.03);
-      ctx.globalAlpha = a;
-      ctx.lineWidth = lw / scale;
-      ctx.stroke();
-    }
-
-    // 4. A few flyaways at the edges.
-    ctx.strokeStyle = "#1a1516";
-    ctx.lineWidth = 0.5 / scale;
-    ctx.globalAlpha = 0.35;
-    ctx.beginPath();
-    for (const f of fly) {
-      for (let k = 0; k <= STEPS; k++) {
-        const t = 0.15 + ((f.len - 0.15) * k) / STEPS;
-        const x = X(f.u, t, f.ph) + Math.sin(t * 12 + f.ph + time * 0.6) * f.amp * t;
-        if (k === 0) ctx.moveTo(x, Y(t));
-        else ctx.lineTo(x, Y(t));
-      }
-    }
-    ctx.stroke();
     ctx.globalAlpha = 1;
   };
 };
 
 // ---------------------------------------------------------------------------
-// cut — hair falling straight to a crisp, angled bob line; trimmed ends drift below.
+// cut — straight strands falling to a crisp, angled bob line; trimmed ends drift below.
 // ---------------------------------------------------------------------------
 export const cut: SceneFactory = ({ opts, pal, rand }) => {
-  const CLUMPS = Math.round(30 * opts.density);
-  const clumps = Array.from({ length: CLUMPS }, (_, c) => ({
-    u: (c + 0.5) / CLUMPS + (rand() - 0.5) * 0.008,
-    endJ: (rand() - 0.5) * 6,
-    phase: rand() * Math.PI * 2,
-    delay: (c / CLUMPS) * 0.7 + rand() * 0.2,
-  }));
-  const strands = Array.from({ length: CLUMPS * 10 }, (_, i) => {
-    const c = clumps[i % CLUMPS];
-    const depth = rand();
+  const n = Math.round(110 * opts.density);
+  const inks = [pal.ink, pal.charcoal, pal.grey, pal.taupe];
+  const golds = new Set([Math.floor(n * 0.3), Math.floor(n * 0.55), Math.floor(n * 0.8)]);
+  const strands = Array.from({ length: n }, (_, i) => {
+    const u = clamp(i / (n - 1) + (rand() - 0.5) * 0.008);
+    const gold = golds.has(i);
     return {
-      c,
-      off: clamp(gauss(rand), -1, 1) * (0.8 / CLUMPS),
-      end: rand() * 3,
-      jPhase: rand() * Math.PI * 2,
-      width: 0.35 + rand() * 0.45 + depth * 0.3,
-      alpha: 0.4 + rand() * 0.3 + depth * 0.25,
-      shade: (depth < 0.35 ? 0 : depth < 0.75 ? 1 : 2) as 0 | 1 | 2,
+      u,
+      color: gold ? pal.gold : inkPick(rand, inks),
+      width: gold ? 1.4 : 0.5 + rand() * 0.8,
+      alpha: gold ? 0.95 : 0.3 + rand() * 0.5,
+      phase: rand() * Math.PI * 2,
+      delay: u * 0.7 + rand() * 0.25,
     };
-  }).sort((a, b) => a.shade - b.shade);
+  });
   const snippets = Array.from({ length: Math.round(18 * opts.density) }, () => ({
     u: 0.12 + rand() * 0.84,
     y0: rand(),
@@ -238,6 +141,7 @@ export const cut: SceneFactory = ({ opts, pal, rand }) => {
     rot: rand() * Math.PI,
     spin: (rand() - 0.5) * 1.2,
     speed: 0.035 + rand() * 0.05,
+    color: rand() < 0.2 ? pal.gold : pal.charcoal,
   }));
   const STEPS = 14;
   const pts: number[] = new Array((STEPS + 1) * 2).fill(0);
@@ -247,48 +151,41 @@ export const cut: SceneFactory = ({ opts, pal, rand }) => {
     const x1 = w * 0.97;
     // Angled bob: shorter at the back (left), longer towards the face (right).
     const hem = (u: number) => h * (0.46 + 0.3 * u ** 1.15);
-    const shades = hairShades(ctx, pal, 0, h * 0.8, 0.3 + 0.03 * Math.sin(time * 0.4), pal.charcoal);
-    const growOf = (d: number) => (opts.animated && opts.drawIn ? easeOut((elapsed - d) / 1.3) : 1);
 
-    const place = (u0: number, off: number, end: number, t: number, jPhase: number, i: number) => {
-      const u = u0 + off * (1 - 0.5 * t ** 4);
-      let x = x0 + (x1 - x0) * u + Math.sin(time * 0.6 + u0 * 5) * 5 * t * t + Math.sin(t * 13 + jPhase) * 0.8;
-      // Ends turn under slightly, like a blow-dried bob.
-      x -= 7 * t ** 7;
-      const y = -12 + (end + 12) * t;
-      pts[i * 2] = x + comb(x, y, pointer, 90, 26) * t;
-      pts[i * 2 + 1] = y;
-    };
-
-    ctx.strokeStyle = pal.charcoal;
-    for (const c of clumps) {
-      const grow = growOf(c.delay);
-      if (grow <= 0) continue;
-      for (let k = 0; k <= STEPS; k++) place(c.u, 0, hem(c.u) + c.endJ - 4, (k / STEPS) * grow, 0, k);
+    for (const s of strands) {
+      let grow = 1;
+      if (opts.animated && opts.drawIn) {
+        grow = easeOut((elapsed - s.delay) / 1.3);
+        if (grow <= 0) continue;
+      }
+      const base = x0 + (x1 - x0) * s.u;
+      const end = hem(s.u);
+      for (let k = 0; k <= STEPS; k++) {
+        const t = (k / STEPS) * grow;
+        let x = base + Math.sin(time * 0.6 + s.u * 5) * 5 * t * t + Math.sin(time * 1.2 + s.phase) * 1.1 * t;
+        // Ends turn under slightly, like a blow-dried bob.
+        x -= 7 * t ** 7;
+        const y = -12 + (end + 12) * t;
+        x += comb(x, y, pointer, 90, 26) * t;
+        pts[k * 2] = x;
+        pts[k * 2 + 1] = y;
+      }
       ctx.beginPath();
       smoothPath(ctx, pts);
-      ctx.globalAlpha = 0.06;
-      ctx.lineWidth = ((x1 - x0) / CLUMPS) * 1.4;
+      ctx.strokeStyle = s.color;
+      ctx.globalAlpha = s.alpha;
+      ctx.lineWidth = s.width;
       ctx.stroke();
     }
 
-    for (const s of strands) {
-      const grow = growOf(s.c.delay);
-      if (grow <= 0) continue;
-      const end = hem(s.c.u + s.off) + s.c.endJ - s.end;
-      for (let k = 0; k <= STEPS; k++) place(s.c.u, s.off, end, (k / STEPS) * grow, s.jPhase, k);
-      ctx.strokeStyle = shades[s.shade];
-      strokeStrand(ctx, pts, STEPS, s.width, s.alpha);
-    }
-
-    // The cut line itself, in gold, once the hair has fallen.
+    // The cut line itself, in gold, once the strands have fallen.
     const lineIn = opts.animated && opts.drawIn ? easeOut((elapsed - 1.6) / 1) : 1;
     if (lineIn > 0) {
       ctx.beginPath();
       for (let k = 0; k <= 24; k++) {
         const u = (k / 24) * lineIn;
         const x = x0 + (x1 - x0) * u;
-        const y = hem(u) + 12;
+        const y = hem(u) + 10;
         if (k === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       }
@@ -313,9 +210,9 @@ export const cut: SceneFactory = ({ opts, pal, rand }) => {
       ctx.beginPath();
       ctx.moveTo(x - dx, y - dy);
       ctx.lineTo(x + dx, y + dy);
-      ctx.strokeStyle = pal.charcoal;
+      ctx.strokeStyle = s.color;
       ctx.globalAlpha = 0.5 * intro * Math.sin(Math.PI * k);
-      ctx.lineWidth = 0.7;
+      ctx.lineWidth = 0.9;
       ctx.stroke();
     }
     ctx.globalAlpha = 1;
@@ -323,95 +220,62 @@ export const cut: SceneFactory = ({ opts, pal, rand }) => {
 };
 
 // ---------------------------------------------------------------------------
-// colour — long waves of hair, painted root-to-tip from dark brunette into gold (balayage).
+// colour — a full curtain of waves, painted root-to-tip from charcoal into gold.
 // ---------------------------------------------------------------------------
 export const colour: SceneFactory = ({ opts, pal, rand }) => {
-  const CLUMPS = Math.round(26 * opts.density);
-  const clumps = Array.from({ length: CLUMPS }, (_, c) => ({
-    u: -0.05 + (1.1 * c) / (CLUMPS - 1) + (rand() - 0.5) * 0.01,
-    amp: 20 + rand() * 22,
-    freq: 0.85 + rand() * 0.35,
-    phase: rand() * 0.2,
-    lean: (rand() - 0.5) * 0.05,
+  const n = Math.round(120 * opts.density);
+  const strands = Array.from({ length: n }, (_, i) => ({
+    u: -0.05 + (1.1 * i) / (n - 1) + (rand() - 0.5) * 0.01,
+    amp: 18 + rand() * 26,
+    freq: 0.8 + rand() * 0.5,
+    phase: rand() * 0.25,
+    lean: (rand() - 0.5) * 0.06,
+    alpha: 0.55 + rand() * 0.45,
+    width: 0.7 + rand() * 1.3,
+    highlight: rand() < 0.3,
     delay: rand() * 0.9,
   }));
-  const strands = Array.from({ length: CLUMPS * 10 }, (_, i) => {
-    const c = clumps[i % CLUMPS];
-    const depth = rand();
-    return {
-      c,
-      off: clamp(gauss(rand), -1, 1) * (0.7 / CLUMPS),
-      jPhase: rand() * Math.PI * 2,
-      tEnd: 0.9 + rand() * 0.1,
-      width: 0.4 + rand() * 0.45 + depth * 0.35,
-      alpha: 0.4 + rand() * 0.3 + depth * 0.25,
-      shade: (depth < 0.35 ? 0 : depth < 0.75 ? 1 : 2) as 0 | 1 | 2,
-    };
-  }).sort((a, b) => a.shade - b.shade);
+  let cachedH = -1;
+  let gradBase: CanvasGradient | null = null;
+  let gradLight: CanvasGradient | null = null;
   const STEPS = 18;
   const pts: number[] = new Array((STEPS + 1) * 2).fill(0);
 
   return ({ ctx, time, elapsed, w, h, pointer }) => {
-    const mk = (stops: [number, string][]) => {
-      const g = ctx.createLinearGradient(0, 0, 0, h);
-      for (const [o, c] of stops) g.addColorStop(o, c);
-      return g;
-    };
-    // Balayage: dark roots melting into gold, with a band of shine.
-    const shades = [
-      mk([
-        [0, pal.ink],
-        [0.4, pal.charcoal],
-        [0.75, pal.taupe],
-        [1, pal.gold],
-      ]),
-      mk([
-        [0, pal.ink],
-        [0.3, pal.charcoal],
-        [0.55, pal.taupe],
-        [0.8, pal.gold],
-        [1, pal.goldPale],
-      ]),
-      mk([
-        [0, pal.charcoal],
-        [0.22, pal.taupe],
-        [0.28, pal.goldPale],
-        [0.35, pal.taupe],
-        [0.6, pal.gold],
-        [1, pal.goldPale],
-      ]),
-    ];
-    const growOf = (d: number) => (opts.animated && opts.drawIn ? easeOut((elapsed - d) / 1.8) : 1);
-    const place = (c: (typeof clumps)[number], off: number, t: number, jPhase: number, i: number) => {
-      const pinch = 1 - 0.45 * t * t;
-      const x =
-        (c.u + off * pinch) * w +
-        c.lean * w * t +
-        c.amp * Math.sin(2 * Math.PI * (c.freq * t + c.phase) - time * 0.45) * (0.3 + t) +
-        Math.sin(t * 15 + jPhase) * 0.9;
-      const y = -20 + (h + 40) * t;
-      pts[i * 2] = x + comb(x, y, pointer, 110, 30);
-      pts[i * 2 + 1] = y;
-    };
-
-    ctx.strokeStyle = pal.taupe;
-    for (const c of clumps) {
-      const grow = growOf(c.delay);
-      if (grow <= 0) continue;
-      for (let k = 0; k <= STEPS; k++) place(c, 0, (k / STEPS) * grow, 0, k);
+    if (h !== cachedH || !gradBase || !gradLight) {
+      cachedH = h;
+      gradBase = ctx.createLinearGradient(0, 0, 0, h);
+      gradBase.addColorStop(0, pal.charcoal);
+      gradBase.addColorStop(0.42, pal.taupe);
+      gradBase.addColorStop(0.78, pal.gold);
+      gradBase.addColorStop(1, pal.goldPale);
+      gradLight = ctx.createLinearGradient(0, 0, 0, h);
+      gradLight.addColorStop(0, pal.taupe);
+      gradLight.addColorStop(0.35, pal.gold);
+      gradLight.addColorStop(0.7, pal.goldPale);
+      gradLight.addColorStop(1, pal.sand);
+    }
+    for (const s of strands) {
+      let grow = 1;
+      if (opts.animated && opts.drawIn) {
+        grow = easeOut((elapsed - s.delay) / 1.8);
+        if (grow <= 0) continue;
+      }
+      for (let k = 0; k <= STEPS; k++) {
+        const t = (k / STEPS) * grow;
+        let x =
+          s.u * w + s.lean * w * t + s.amp * Math.sin(2 * Math.PI * (s.freq * t + s.phase) - time * 0.45) * (0.3 + t);
+        const y = -20 + (h + 40) * t;
+        x += comb(x, y, pointer, 110, 30);
+        pts[k * 2] = x;
+        pts[k * 2 + 1] = y;
+      }
       ctx.beginPath();
       smoothPath(ctx, pts);
-      ctx.globalAlpha = 0.07;
-      ctx.lineWidth = (w / CLUMPS) * 1.2;
+      ctx.strokeStyle = s.highlight ? gradLight : gradBase;
+      ctx.globalAlpha = s.alpha;
+      ctx.lineWidth = s.width;
       ctx.stroke();
-    }
-
-    for (const s of strands) {
-      const grow = growOf(s.c.delay);
-      if (grow <= 0) continue;
-      for (let k = 0; k <= STEPS; k++) place(s.c, s.off, (k / STEPS) * s.tEnd * grow, s.jPhase, k);
-      ctx.strokeStyle = shades[s.shade];
-      strokeStrand(ctx, pts, STEPS, s.width, s.alpha);
     }
     ctx.globalAlpha = 1;
   };

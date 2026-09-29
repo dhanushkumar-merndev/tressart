@@ -77,7 +77,7 @@ body {
    Components
 --------------------------------------------------------------------------- */
 @layer components {
-  /* Solid by default; fades in from transparent on scroll where supported. */
+  /* Always solid, so the logo reads over dark, full-bleed heroes. */
   .site-header {
     background-color: rgb(247 245 241 / 0.92);
     border-bottom: 1px solid var(--color-soft);
@@ -236,13 +236,6 @@ body {
     transform: translateX(-50%);
   }
 }
-@keyframes header-solid {
-  from {
-    background-color: rgb(247 245 241 / 0);
-    border-bottom-color: transparent;
-    backdrop-filter: none;
-  }
-}
 
 @media (prefers-reduced-motion: no-preference) {
   .rise {
@@ -273,13 +266,6 @@ body {
     }
   }
 
-  @supports (animation-timeline: scroll()) {
-    .site-header {
-      animation: header-solid linear both;
-      animation-timeline: scroll(root);
-      animation-range: 0 140px;
-    }
-  }
 }
 
 /* Accordion marker */

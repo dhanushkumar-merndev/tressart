@@ -61,8 +61,8 @@ export default function HomePage() {
           </div>
           <div className="relative mt-10 h-[52svh] w-full md:absolute md:inset-y-0 md:right-0 md:mt-0 md:h-auto md:w-[54%] lg:w-[50%]">
             <Image
-              src="/images/tressart-hero-model.png"
-              alt="Model with glossy, dimensional balayage waves by tressart salon"
+              src="/images/tressart-hero-portrait.png"
+              alt="Model with long, glossy hair and teal glitter eye makeup"
               fill
               priority
               sizes="(max-width: 768px) 100vw, 54vw"

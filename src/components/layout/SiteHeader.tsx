@@ -1,14 +1,32 @@
 "use client";
 
+import { useLenis } from "lenis/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Logo } from "@/components/brand/Logo";
-import { Close, Menu, Phone } from "@/components/ui/icons";
-import { nav, site } from "@/lib/site";
+import { ArrowUpRight, Close, Pin } from "@/components/ui/icons";
+import { site } from "@/lib/site";
+
+const menu = [
+  { href: "/", label: "Home" },
+  { href: "/services", label: "Services" },
+  { href: "/services/bridal-makeup", label: "Bridal" },
+  { href: "/about", label: "About us" },
+  { href: "/contact", label: "Contact" },
+] as const;
+
+function Burger({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 40 24" className={className} aria-hidden="true" focusable="false">
+      <path d="M0 2h40M0 12h40M0 22h40" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  );
+}
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const lenis = useLenis();
   const [open, setOpen] = useState(false);
   const [lastPath, setLastPath] = useState(pathname);
 
@@ -20,103 +38,140 @@ export function SiteHeader() {
 
   useEffect(() => {
     if (!open) return;
+    lenis?.stop();
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     window.addEventListener("keydown", onKey);
     return () => {
+      lenis?.start();
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [open]);
+  }, [open, lenis]);
 
   const isActive = (href: string) =>
-    href === "/services" ? pathname === "/services" : pathname === href || pathname.startsWith(`${href}/`);
+    href === "/" || href === "/services" ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
 
-  // The menu panel is rendered outside <header>: the header's backdrop-filter
-  // makes it the containing block for fixed children, which would collapse it.
   return (
     <>
       <header className="site-header fixed inset-x-0 top-0 z-50">
-        <div className="container-x flex h-[var(--header-h)] items-center justify-between gap-6">
-          <Link href="/" aria-label="tressart salon — home" className="shrink-0">
-            <Logo variant="wordmark" className="h-[46px] w-auto" eager />
+        <div className="relative flex h-[var(--header-h)] items-center justify-between px-5 md:px-10">
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            aria-expanded={open}
+            aria-controls="site-menu"
+            className="-ml-1 flex items-center gap-4 p-1 text-charcoal transition-colors hover:text-ink"
+          >
+            <Burger className="h-[18px] w-8 md:h-5 md:w-10" />
+            <span className="hidden text-sm uppercase tracking-[0.12em] sm:inline">Menu</span>
+            <span className="sr-only sm:hidden">Open menu</span>
+          </button>
+
+          <Link href="/" aria-label="tressart salon — home" className="absolute left-1/2 -translate-x-1/2">
+            <Logo variant="wordmark" className="h-9 w-auto md:h-11" eager />
           </Link>
 
-          <nav aria-label="Primary" className="hidden lg:block">
-            <ul className="flex items-center gap-10">
-              {nav.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    aria-current={isActive(item.href) ? "page" : undefined}
-                    className="link-line text-[0.78rem] font-medium uppercase tracking-[0.18em] text-charcoal aria-[current=page]:bg-[length:100%_1px]"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <a
-              href={site.phone.href}
-              className="hidden items-center gap-2 text-sm text-charcoal md:inline-flex xl:mr-3"
-            >
-              <Phone className="size-4 text-gold" />
-              <span className="link-line">{site.phone.display}</span>
-            </a>
-            <a href={site.phone.href} className="btn btn-dark hidden !min-h-11 sm:inline-flex">
-              Book a visit
-            </a>
-            <button
-              type="button"
-              className="-mr-2 inline-flex size-11 items-center justify-center lg:hidden"
-              aria-expanded={open}
-              aria-controls="mobile-menu"
-              aria-label={open ? "Close menu" : "Open menu"}
-              onClick={() => setOpen((v) => !v)}
-            >
-              {open ? <Close className="size-6" /> : <Menu className="size-6" />}
-            </button>
-          </div>
+          <Link
+            href="/contact"
+            className="flex items-center gap-2 p-1 text-charcoal transition-colors hover:text-ink"
+            aria-label="Visit the salon"
+          >
+            <Pin className="size-6" />
+            <span className="hidden text-sm uppercase tracking-[0.12em] sm:inline">Visit the salon</span>
+          </Link>
         </div>
       </header>
 
-      {open && (
-        <div
-          id="mobile-menu"
-          className="fixed inset-x-0 bottom-0 top-[var(--header-h)] z-[45] overflow-y-auto bg-paper lg:hidden"
-        >
-          <nav aria-label="Mobile" className="container-x flex min-h-full flex-col pb-10 pt-8">
-            <ul className="flex flex-col border-t border-soft">
-              {[{ href: "/", label: "Home" }, ...nav].map((item, i) => (
-                <li key={item.href} className="border-b border-soft">
-                  <Link
-                    href={item.href}
-                    aria-current={pathname === item.href ? "page" : undefined}
-                    className="rise flex items-baseline justify-between py-5 text-[2rem] font-light tracking-tight aria-[current=page]:text-gold"
-                    style={{ animationDelay: `${i * 50}ms` }}
-                  >
-                    {item.label}
-                    <span className="text-xs tracking-[0.2em] text-grey">0{i + 1}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-auto space-y-2 pt-10 text-sm text-mute">
-              <p>{site.addressOneLine}</p>
-              <p>
-                {site.hours.label} · {site.hours.time}
-              </p>
-              <a href={site.phone.href} className="btn btn-dark mt-6 w-full">
-                <Phone className="size-4" /> Call {site.phone.display}
-              </a>
-            </div>
-          </nav>
+      {/* Page wash behind the open menu */}
+      <div
+        aria-hidden="true"
+        onClick={() => setOpen(false)}
+        className={`fixed inset-0 z-[60] bg-studio/70 transition-opacity duration-500 ${
+          open ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+      />
+
+      <aside
+        id="site-menu"
+        aria-label="Site menu"
+        inert={!open}
+        data-lenis-prevent
+        className={`fixed inset-y-0 left-0 z-[70] flex w-full flex-col overflow-y-auto border-r border-ink/10 bg-studio transition-transform duration-500 ease-[var(--ease-silk)] sm:w-[440px] lg:w-[33vw] lg:min-w-[440px] ${
+          open ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="flex h-[var(--header-h)] shrink-0 items-center px-5 md:px-10 lg:justify-end lg:pr-[max(2.5rem,calc(33vw-360px))]">
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="flex w-[280px] items-center gap-4 p-1 text-charcoal hover:text-ink"
+          >
+            <Close className="size-8" />
+            <span className="text-sm uppercase tracking-[0.12em]">Close menu</span>
+          </button>
         </div>
-      )}
+
+        <nav aria-label="Primary" className="mt-2">
+          <ul className="border-b border-ink/10">
+            {menu.map((item) => (
+              <li key={item.href} className="border-t border-ink/10 first:border-t-0">
+                <Link
+                  href={item.href}
+                  aria-current={isActive(item.href) ? "page" : undefined}
+                  className="flex px-5 py-4 transition-colors hover:bg-paper aria-[current=page]:bg-paper md:px-10 lg:justify-end lg:pr-[max(2.5rem,calc(33vw-360px))]"
+                >
+                  <span className="w-[280px] text-lg uppercase tracking-[0.06em] text-charcoal">{item.label}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div className="mt-16 border-y border-ink/10">
+          {[
+            { key: "title", body: <span className="text-lg uppercase tracking-[0.06em]">Visit the salon</span> },
+            { key: "address", body: <span className="text-sm leading-relaxed text-mute">{site.addressOneLine}</span> },
+            {
+              key: "hours",
+              body: (
+                <span className="text-sm uppercase tracking-[0.1em] text-mute">
+                  {site.hours.label} · {site.hours.time}
+                </span>
+              ),
+            },
+            {
+              key: "phone",
+              body: (
+                <a href={site.phone.href} className="text-sm uppercase tracking-[0.1em] text-charcoal hover:text-ink">
+                  Call {site.phone.display}
+                </a>
+              ),
+            },
+            {
+              key: "directions",
+              body: (
+                <a
+                  href={site.maps.directions}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm uppercase tracking-[0.1em] text-charcoal hover:text-ink"
+                >
+                  Get directions <ArrowUpRight className="size-4" />
+                </a>
+              ),
+            },
+          ].map((row) => (
+            <div
+              key={row.key}
+              className="flex border-t border-ink/10 px-5 py-4 first:border-t-0 md:px-10 lg:justify-end lg:pr-[max(2.5rem,calc(33vw-360px))]"
+            >
+              <div className="w-[280px]">{row.body}</div>
+            </div>
+          ))}
+        </div>
+      </aside>
     </>
   );
 }

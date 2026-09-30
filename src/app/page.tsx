@@ -34,75 +34,46 @@ const stats = [
   { value: "7", label: "Service disciplines" },
 ];
 
-// Editorial grid: the first tile is the tall feature, the rest fill around it.
-const tileLayout = [
-  "md:col-span-2 md:row-span-2",
-  "",
-  "",
-  "",
-  "",
-  "md:col-span-2",
-  "md:col-span-2",
-];
-
 export default function HomePage() {
   return (
     <>
       <JsonLd data={faqSchema(generalFaqs)} />
 
       {/* ------------------------------------------------------------ Hero */}
-      <section
-        aria-labelledby="hero-title"
-        className="relative flex min-h-svh flex-col overflow-hidden bg-ink pt-[var(--header-h)] text-paper"
-      >
-        <div className="absolute inset-y-0 right-0 w-full sm:w-[70%] lg:w-[52%]">
+      <section aria-labelledby="hero-title" className="relative overflow-hidden bg-[#f5f5f5] pt-[var(--header-h)]">
+        <div className="absolute inset-x-0 bottom-0 top-[var(--header-h)] md:left-auto md:w-[46%] lg:w-[40%]">
           <Image
-            src="/images/tressart-hair-hero-faded.png"
-            alt="Long glossy balayage hair, styled at tressart salon"
+            src="/images/tressart-hair-hero.png"
+            alt="Long, glossy balayage waves styled at tressart salon"
             fill
             priority
-            sizes="(max-width: 640px) 100vw, 52vw"
-            className="object-cover object-top opacity-60 sm:opacity-90"
+            sizes="(max-width: 768px) 100vw, 46vw"
+            className="object-contain object-bottom opacity-30 md:object-right-bottom md:opacity-100"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/40 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-ink to-transparent" />
         </div>
-
-        <div className="container-x relative flex flex-1 flex-col justify-end pb-12 pt-16 md:pb-16">
-          <p className="rise text-xs font-medium uppercase tracking-[0.3em] text-paper/70">
-            tressart salon · Harlur Road, Bengaluru
-          </p>
+        <div className="relative flex min-h-[calc(100svh-var(--header-h))] flex-col items-center justify-center px-5 py-20 text-center">
+          <p className="rise text-xs uppercase tracking-[0.3em] text-mute">tressart salon · Harlur Road, Bengaluru</p>
           <h1
             id="hero-title"
-            className="rise rise-1 mt-6 text-[clamp(3.4rem,11vw,10.5rem)] font-bold uppercase leading-[0.86] tracking-[-0.04em]"
+            className="rise rise-1 mt-6 text-[clamp(2.1rem,4.4vw,3.8rem)] font-light uppercase leading-[1.15] tracking-[0.02em] text-charcoal"
           >
             Where hair
             <br />
-            becomes art<span className="text-gold">.</span>
+            becomes art
           </h1>
-          <div className="rise rise-2 mt-10 grid gap-8 border-t border-paper/20 pt-8 md:grid-cols-12 md:items-end">
-            <p className="max-w-xl text-lead text-paper/75 md:col-span-6">
-              A L&apos;Oréal Professionnel flagship salon for precision cuts, considered colour, skin rituals and
-              bridal beauty.
-            </p>
-            <div className="btn-row md:col-span-6 md:justify-end">
-              <a href={site.phone.href} className="btn btn-light">
-                Book your visit
-              </a>
-              <Link href="/services" className="btn btn-ghost-light">
-                Explore services <ArrowRight className="size-4" />
-              </Link>
-            </div>
-          </div>
+          <Link
+            href="/services"
+            className="rise rise-2 mt-10 inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-charcoal"
+          >
+            <span className="link-line">Explore our services</span> <ArrowRight className="size-4" />
+          </Link>
         </div>
       </section>
 
       {/* ------------------------------------------------------- Statement */}
       <section aria-labelledby="statement-title" className="py-24 md:py-36">
         <div className="container-x grid gap-10 lg:grid-cols-12">
-          <p className="reveal text-xs font-medium uppercase tracking-[0.3em] text-mute lg:col-span-3">
-            The salon
-          </p>
+          <p className="reveal text-xs font-medium uppercase tracking-[0.3em] text-mute lg:col-span-3">The salon</p>
           <div className="lg:col-span-9">
             <h2
               id="statement-title"
@@ -111,10 +82,13 @@ export default function HomePage() {
               Hairdressing is a craft. We treat it like one.
             </h2>
             <p className="reveal mt-8 max-w-2xl text-lead text-mute">
-              Our name joins two words: tress, a lock of hair, and art. Every visit begins with listening and ends
-              with a look that feels effortless to live with, in a quiet, considered space on Harlur Road.
+              Our name joins two words: tress, a lock of hair, and art. Every visit begins with listening and ends with
+              a look that feels effortless to live with, in a quiet, considered space on Harlur Road.
             </p>
-            <Link href="/about" className="reveal mt-10 inline-flex items-center gap-2 text-sm font-medium uppercase tracking-[0.2em]">
+            <Link
+              href="/about"
+              className="reveal mt-10 inline-flex items-center gap-2 text-sm font-medium uppercase tracking-[0.2em]"
+            >
               <span className="link-line">Our story</span> <ArrowRight className="size-4" />
             </Link>
           </div>
@@ -139,39 +113,49 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <ul className="mt-10 grid auto-rows-[320px] gap-3 sm:grid-cols-2 md:auto-rows-[300px] md:grid-cols-4">
-            {services.map((s, i) => (
-              <li key={s.slug} className={`reveal ${tileLayout[i] ?? ""}`}>
-                <Link
-                  href={`/services/${s.slug}`}
-                  className="group relative block h-full overflow-hidden bg-ink text-paper"
+          <ul className="mt-12 border-b border-ink/10">
+            {services.map((s, i) => {
+              const flip = i % 2 === 1;
+              return (
+                <li
+                  key={s.slug}
+                  className="reveal grid items-center gap-8 border-t border-ink/10 py-10 md:grid-cols-2 md:gap-16 md:py-14"
                 >
-                  <Image
-                    src={s.image}
-                    alt={s.imageAlt}
-                    fill
-                    sizes={i === 0 ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 100vw, 25vw"}
-                    className="object-cover transition-transform duration-[1.2s] ease-[var(--ease-silk)] group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/10 to-transparent" />
-                  <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 md:p-6">
-                    <div>
-                      <span className="text-xs tracking-[0.24em] text-paper/60">{s.number}</span>
-                      <h3
-                        className={`mt-2 font-bold uppercase leading-[0.95] tracking-[-0.02em] ${
-                          i === 0 ? "text-[clamp(1.8rem,3.2vw,3rem)]" : "text-xl"
-                        }`}
-                      >
-                        {s.title}
-                      </h3>
-                    </div>
-                    <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-paper/40 transition-colors duration-500 group-hover:bg-paper group-hover:text-ink">
-                      <ArrowUpRight className="size-4" />
-                    </span>
+                  <Link
+                    href={`/services/${s.slug}`}
+                    className={`group relative block aspect-[4/3] overflow-hidden bg-soft ${flip ? "md:order-2" : ""}`}
+                    aria-label={s.title}
+                  >
+                    <Image
+                      src={s.image}
+                      alt={s.imageAlt}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover transition-transform duration-[1.2s] ease-[var(--ease-silk)] group-hover:scale-105"
+                    />
+                  </Link>
+                  <div className={flip ? "md:order-1" : ""}>
+                    <span className="text-xs tracking-[0.24em] text-grey">{s.number}</span>
+                    <h3 className="mt-4 text-[clamp(1.8rem,3.2vw,2.8rem)] font-bold uppercase leading-[0.95] tracking-[-0.02em]">
+                      {s.title}
+                    </h3>
+                    <p className="mt-5 text-lg text-charcoal">{s.headline}</p>
+                    <p className="mt-3 max-w-md leading-relaxed text-mute">{s.summary}</p>
+                    <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-xs uppercase tracking-[0.16em] text-charcoal/80">
+                      {s.highlights.map((h) => (
+                        <li key={h}>{h}</li>
+                      ))}
+                    </ul>
+                    <Link
+                      href={`/services/${s.slug}`}
+                      className="mt-8 inline-flex items-center gap-2 text-sm font-medium uppercase tracking-[0.2em]"
+                    >
+                      <span className="link-line">Explore</span> <ArrowRight className="size-4" />
+                    </Link>
                   </div>
-                </Link>
-              </li>
-            ))}
+                </li>
+              );
+            })}
           </ul>
         </div>
       </section>
@@ -196,8 +180,8 @@ export default function HomePage() {
             For the days you&apos;ll remember.
           </h2>
           <p className="reveal mt-8 max-w-lg text-lead text-paper/70">
-            Pre-bridal skin and hair rituals, then makeup and hair for every celebration: engagement, sangeet,
-            wedding and reception, for you and the people beside you.
+            Pre-bridal skin and hair rituals, then makeup and hair for every celebration: engagement, sangeet, wedding
+            and reception, for you and the people beside you.
           </p>
           <div className="reveal btn-row mt-10">
             <Link href="/services/bridal-makeup" className="btn btn-light">
@@ -239,7 +223,10 @@ export default function HomePage() {
       </section>
 
       {/* ---------------------------------------------------------- Colour */}
-      <section aria-labelledby="colour-title" className="relative flex min-h-[80svh] items-end overflow-hidden text-paper">
+      <section
+        aria-labelledby="colour-title"
+        className="relative flex min-h-[80svh] items-end overflow-hidden text-paper"
+      >
         <Image
           src="/images/services/service-hair-colour.jpg"
           alt="Dimensional balayage colour by tressart colourists"

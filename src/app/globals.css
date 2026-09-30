@@ -38,7 +38,7 @@
 
 :root {
   color-scheme: light;
-  --header-h: 76px;
+  --header-h: 84px;
 }
 
 html {
@@ -79,9 +79,8 @@ body {
 @layer components {
   /* Always solid, so the logo reads over dark, full-bleed heroes. */
   .site-header {
-    background-color: rgb(247 245 241 / 0.92);
+    background-color: var(--color-studio);
     border-bottom: 1px solid var(--color-soft);
-    backdrop-filter: saturate(1.2) blur(14px);
   }
 
   .container-x {

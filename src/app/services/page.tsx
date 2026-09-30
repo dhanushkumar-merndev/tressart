@@ -2,10 +2,14 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { CtaBand } from "@/components/sections/CtaBand";
+import { FaqList } from "@/components/sections/FaqList";
 import { PageHero } from "@/components/sections/PageHero";
+import { SectionHeading } from "@/components/sections/SectionHeading";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { ArrowRight } from "@/components/ui/icons";
 import { pageMetadata } from "@/lib/metadata";
-import { services } from "@/lib/services";
+import { faqSchema } from "@/lib/schema";
+import { generalFaqs, services } from "@/lib/services";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
@@ -18,6 +22,7 @@ export const metadata: Metadata = pageMetadata({
 export default function ServicesPage() {
   return (
     <>
+      <JsonLd data={faqSchema(generalFaqs)} />
       <PageHero
         crumbs={[{ name: "Services", path: "/services" }]}
         eyebrow="The service menu"
@@ -47,51 +52,51 @@ export default function ServicesPage() {
       </nav>
 
       <div className="container-x py-12 md:py-20">
-        {services.map((s) => (
-          <section
-            key={s.slug}
-            id={s.slug}
-            aria-labelledby={`${s.slug}-title`}
-            className="grid gap-10 border-b border-ink/10 py-16 last:border-b-0 md:py-24 lg:grid-cols-12"
-          >
-            <div className="reveal lg:sticky lg:top-32 lg:col-span-4 lg:self-start">
-              <span className="text-xs tracking-[0.24em] text-grey">{s.number}</span>
-              <h2
-                id={`${s.slug}-title`}
-                className="mt-5 text-[clamp(2rem,3.6vw,3rem)] font-light leading-tight tracking-tight"
+        <ul className="border-b border-ink/10">
+          {services.map((s, i) => {
+            const flip = i % 2 === 0;
+            return (
+              <li
+                key={s.slug}
+                id={s.slug}
+                className="reveal grid scroll-mt-32 items-center gap-8 border-t border-ink/10 py-10 first:border-t-0 md:grid-cols-2 md:gap-16 md:py-14"
               >
-                {s.title}
-              </h2>
-              <p className="mt-4 max-w-sm text-mute">{s.headline}</p>
-              <Link
-                href={`/services/${s.slug}`}
-                className="group mt-6 block overflow-hidden rounded-[22px] border border-ink/10 bg-sand/30 shadow-[0_12px_30px_rgba(35,31,32,0.06)]"
-              >
-                <div className="relative aspect-[16/10] w-full overflow-hidden">
+                <Link
+                  href={`/services/${s.slug}`}
+                  className={`group relative block aspect-[4/3] overflow-hidden bg-soft ${flip ? "md:order-2" : ""}`}
+                  aria-label={s.title}
+                >
                   <Image
                     src={s.image}
                     alt={s.imageAlt}
                     fill
-                    sizes="(max-width: 1024px) 100vw, 33vw"
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover transition-transform duration-[1.2s] ease-[var(--ease-silk)] group-hover:scale-105"
                   />
+                </Link>
+                <div className={flip ? "md:order-1" : ""}>
+                  <span className="text-xs tracking-[0.24em] text-grey">{s.number}</span>
+                  <h2 className="mt-4 text-[clamp(1.8rem,3.2vw,2.8rem)] font-bold uppercase leading-[0.95] tracking-[-0.02em]">
+                    {s.title}
+                  </h2>
+                  <p className="mt-5 text-lg text-charcoal">{s.headline}</p>
+                  <p className="mt-3 max-w-md leading-relaxed text-mute">{s.summary}</p>
+                  <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-xs uppercase tracking-[0.16em] text-charcoal/80">
+                    {s.highlights.map((h) => (
+                      <li key={h}>{h}</li>
+                    ))}
+                  </ul>
+                  <Link
+                    href={`/services/${s.slug}`}
+                    className="mt-8 inline-flex items-center gap-2 text-sm font-medium uppercase tracking-[0.2em]"
+                  >
+                    <span className="link-line">Explore</span> <ArrowRight className="size-4" />
+                  </Link>
                 </div>
-              </Link>
-              <Link href={`/services/${s.slug}`} className="mt-6 inline-flex items-center gap-2 text-sm font-medium">
-                <span className="link-line">More about {s.title.toLowerCase()}</span>
-                <ArrowRight className="size-4" />
-              </Link>
-            </div>
-            <ul className="grid gap-x-10 sm:grid-cols-2 lg:col-span-7 lg:col-start-6">
-              {s.items.map((item) => (
-                <li key={item.name} className="reveal border-t border-ink/10 py-6">
-                  <h3 className="text-lg font-normal tracking-tight">{item.name}</h3>
-                  <p className="mt-2 text-[0.95rem] leading-relaxed text-mute">{item.description}</p>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))}
+              </li>
+            );
+          })}
+        </ul>
 
         <p className="reveal mx-auto mt-10 max-w-2xl text-center text-sm leading-relaxed text-mute">
           Pricing depends on the service, your hair length and your stylist. Call{" "}
@@ -101,6 +106,17 @@ export default function ServicesPage() {
           for our current rate card — we&apos;re always happy to advise before you book.
         </p>
       </div>
+
+      <section aria-labelledby="faq-title" className="border-t border-ink/10 py-24 md:py-36">
+        <div className="container-x grid gap-12 lg:grid-cols-12">
+          <div className="lg:sticky lg:top-32 lg:col-span-4 lg:self-start">
+            <SectionHeading id="faq-title" eyebrow="Before you book" title="Good to know." />
+          </div>
+          <div className="reveal lg:col-span-8">
+            <FaqList faqs={generalFaqs} />
+          </div>
+        </div>
+      </section>
 
       <CtaBand />
     </>

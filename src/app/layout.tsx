@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import { HideOnHome } from "@/components/layout/HideOnHome";
 import { MobileCallBar } from "@/components/layout/MobileCallBar";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
@@ -89,8 +90,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <main id="main" className="flex-1">
             {children}
           </main>
-          <SiteFooter />
-          <MobileCallBar />
+          <HideOnHome>
+            <SiteFooter />
+            <MobileCallBar />
+          </HideOnHome>
         </SmoothScroll>
       </body>
     </html>

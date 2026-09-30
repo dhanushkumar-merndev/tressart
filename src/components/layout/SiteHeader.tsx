@@ -5,13 +5,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Logo } from "@/components/brand/Logo";
-import { ArrowUpRight, Close, Pin } from "@/components/ui/icons";
+import { ArrowUpRight, ChevronDown, Close, Pin } from "@/components/ui/icons";
+import { services } from "@/lib/services";
 import { site } from "@/lib/site";
 
 const menu = [
   { href: "/", label: "Home" },
   { href: "/services", label: "Services" },
-  { href: "/services/bridal-makeup", label: "Bridal" },
   { href: "/about", label: "About us" },
   { href: "/contact", label: "Contact" },
 ] as const;
@@ -28,6 +28,7 @@ export function SiteHeader() {
   const pathname = usePathname();
   const lenis = useLenis();
   const [open, setOpen] = useState(false);
+  const [servicesOpen, setServicesOpen] = useState(true);
   const [lastPath, setLastPath] = useState(pathname);
 
   // Close the menu whenever the route changes.
@@ -115,24 +116,104 @@ export function SiteHeader() {
 
         <nav aria-label="Primary" className="mt-2">
           <ul className="border-b border-ink/10">
-            {menu.map((item) => (
-              <li key={item.href} className="border-t border-ink/10 first:border-t-0">
-                <Link
-                  href={item.href}
-                  aria-current={isActive(item.href) ? "page" : undefined}
-                  className="flex px-5 py-4 transition-colors hover:bg-paper aria-[current=page]:bg-paper md:px-10 lg:justify-end lg:pr-[max(2.5rem,calc(33vw-360px))]"
-                >
-                  <span className="w-[280px] text-lg uppercase tracking-[0.06em] text-charcoal">{item.label}</span>
-                </Link>
-              </li>
-            ))}
+            {menu.map((item) => {
+              if (item.href === "/services") {
+                const isServicesCurrent = pathname === "/services";
+                return (
+                  <li key={item.href} className="border-t border-ink/10 first:border-t-0">
+                    <div
+                      className={`relative flex items-center px-5 py-4 transition-colors hover:bg-paper ${
+                        isServicesCurrent ? "bg-paper" : ""
+                      } md:px-10 lg:justify-end lg:pr-[max(2.5rem,calc(33vw-360px))]`}
+                    >
+                      <Link
+                        href="/services"
+                        aria-current={isServicesCurrent ? "page" : undefined}
+                        className="w-[280px] text-lg uppercase tracking-[0.06em] text-charcoal hover:text-ink"
+                      >
+                        {item.label}
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => setServicesOpen((prev) => !prev)}
+                        aria-expanded={servicesOpen}
+                        aria-label="Toggle services list"
+                        className="absolute inset-y-0 right-3 flex w-10 items-center justify-center text-charcoal transition-colors hover:text-ink md:right-8"
+                      >
+                        <ChevronDown
+                          className={`size-5 transition-transform duration-300 ease-[var(--ease-silk)] ${
+                            servicesOpen ? "rotate-180" : ""
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    <div
+                      className={`grid transition-[grid-template-rows,opacity] duration-300 ease-[var(--ease-silk)] ${
+                        servicesOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0 pointer-events-none"
+                      }`}
+                    >
+                      <div className="overflow-hidden">
+                        <ul className="border-t border-ink/10 bg-soft/20 py-2">
+                          {services.map((s) => {
+                            const isServiceActive = pathname === `/services/${s.slug}`;
+                            return (
+                              <li key={s.slug}>
+                                <Link
+                                  href={`/services/${s.slug}`}
+                                  aria-current={isServiceActive ? "page" : undefined}
+                                  className={`flex px-5 py-2.5 transition-colors hover:bg-paper ${
+                                    isServiceActive ? "bg-paper font-medium text-ink" : "text-mute hover:text-ink"
+                                  } md:px-10 lg:justify-end lg:pr-[max(2.5rem,calc(33vw-360px))]`}
+                                >
+                                  <span className="w-[280px] pl-4 text-sm tracking-[0.04em]">
+                                    {s.title}
+                                  </span>
+                                </Link>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
+                    </div>
+                  </li>
+                );
+              }
+
+              return (
+                <li key={item.href} className="border-t border-ink/10 first:border-t-0">
+                  <Link
+                    href={item.href}
+                    aria-current={isActive(item.href) ? "page" : undefined}
+                    className="flex px-5 py-4 transition-colors hover:bg-paper aria-[current=page]:bg-paper md:px-10 lg:justify-end lg:pr-[max(2.5rem,calc(33vw-360px))]"
+                  >
+                    <span className="w-[280px] text-lg uppercase tracking-[0.06em] text-charcoal">{item.label}</span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
         <div className="mt-16 border-y border-ink/10">
           {[
             { key: "title", body: <span className="text-lg uppercase tracking-[0.06em]">Visit the salon</span> },
-            { key: "address", body: <span className="text-sm leading-relaxed text-mute">{site.addressOneLine}</span> },
+            {
+              key: "address",
+              body: (
+                <>
+                  <span className="block text-sm leading-relaxed text-mute">{site.addressOneLine}</span>
+                  <a
+                    href={site.maps.directions}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-flex items-center gap-2 text-sm uppercase tracking-[0.1em] text-charcoal hover:text-ink"
+                  >
+                    Get directions <ArrowUpRight className="size-4" />
+                  </a>
+                </>
+              ),
+            },
             {
               key: "hours",
               body: (
@@ -149,23 +230,12 @@ export function SiteHeader() {
                 </a>
               ),
             },
-            {
-              key: "directions",
-              body: (
-                <a
-                  href={site.maps.directions}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm uppercase tracking-[0.1em] text-charcoal hover:text-ink"
-                >
-                  Get directions <ArrowUpRight className="size-4" />
-                </a>
-              ),
-            },
           ].map((row) => (
             <div
               key={row.key}
-              className="flex border-t border-ink/10 px-5 py-4 first:border-t-0 md:px-10 lg:justify-end lg:pr-[max(2.5rem,calc(33vw-360px))]"
+              className={`flex px-5 py-4 md:px-10 lg:justify-end lg:pr-[max(2.5rem,calc(33vw-360px))] ${
+                row.key === "title" || row.key === "address" ? "" : "border-t border-ink/10"
+              }`}
             >
               <div className="w-[280px]">{row.body}</div>
             </div>

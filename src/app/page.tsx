@@ -41,32 +41,34 @@ export default function HomePage() {
 
       {/* ------------------------------------------------------------ Hero */}
       <section aria-labelledby="hero-title" className="relative overflow-hidden bg-[#f5f5f5] pt-[var(--header-h)]">
-        <div className="absolute inset-x-0 bottom-0 top-[var(--header-h)] md:left-auto md:w-[46%] lg:w-[40%]">
-          <Image
-            src="/images/tressart-hair-hero.png"
-            alt="Long, glossy balayage waves styled at tressart salon"
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw, 46vw"
-            className="object-contain object-bottom opacity-30 md:object-right-bottom md:opacity-100"
-          />
-        </div>
-        <div className="relative flex min-h-[calc(100svh-var(--header-h))] flex-col items-center justify-center px-5 py-20 text-center">
-          <p className="rise text-xs uppercase tracking-[0.3em] text-mute">tressart salon · Harlur Road, Bengaluru</p>
-          <h1
-            id="hero-title"
-            className="rise rise-1 mt-6 text-[clamp(2.1rem,4.4vw,3.8rem)] font-light uppercase leading-[1.15] tracking-[0.02em] text-charcoal"
-          >
-            Where hair
-            <br />
-            becomes art
-          </h1>
-          <Link
-            href="/services"
-            className="rise rise-2 mt-10 inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-charcoal"
-          >
-            <span className="link-line">Explore our services</span> <ArrowRight className="size-4" />
-          </Link>
+        <div className="relative flex min-h-[calc(100svh-var(--header-h))] flex-col md:block">
+          <div className="relative z-10 flex flex-col items-center px-5 pt-14 text-center md:absolute md:inset-y-0 md:left-0 md:right-[46%] md:justify-center md:pt-0 lg:right-[42%]">
+            <p className="rise text-xs uppercase tracking-[0.3em] text-mute">tressart salon · Harlur Road, Bengaluru</p>
+            <h1
+              id="hero-title"
+              className="rise rise-1 mt-6 text-[clamp(2.1rem,4.2vw,3.8rem)] font-light uppercase leading-[1.15] tracking-[0.02em] text-charcoal"
+            >
+              Where hair
+              <br />
+              becomes art
+            </h1>
+            <Link
+              href="/services"
+              className="rise rise-2 mt-10 inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-charcoal"
+            >
+              <span className="link-line">Explore our services</span> <ArrowRight className="size-4" />
+            </Link>
+          </div>
+          <div className="relative mt-10 h-[52svh] w-full md:absolute md:inset-y-0 md:right-0 md:mt-0 md:h-auto md:w-[54%] lg:w-[50%]">
+            <Image
+              src="/images/tressart-hero-model.png"
+              alt="Model with glossy, dimensional balayage waves by tressart salon"
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 54vw"
+              className="object-contain object-bottom md:object-right-bottom"
+            />
+          </div>
         </div>
       </section>
 

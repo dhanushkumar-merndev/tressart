@@ -117,7 +117,7 @@ export default function HomePage() {
 
           <ul className="mt-12 border-b border-ink/10">
             {services.map((s, i) => {
-              const flip = i % 2 === 1;
+              const flip = i % 2 === 0;
               return (
                 <li
                   key={s.slug}

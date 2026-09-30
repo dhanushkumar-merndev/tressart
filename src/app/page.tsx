@@ -43,14 +43,14 @@ export default function HomePage() {
       <section aria-labelledby="hero-title" className="relative overflow-hidden bg-[#f5f5f5] pt-[var(--header-h)]">
         <div className="relative flex min-h-[calc(100svh-var(--header-h))] flex-col md:block">
           <div className="relative z-10 flex flex-col items-center px-5 pt-14 text-center md:absolute md:inset-y-0 md:left-0 md:right-[46%] md:justify-center md:pt-0 lg:right-[42%]">
-            <p className="rise text-xs uppercase tracking-[0.3em] text-mute">tressart salon · Harlur Road, Bengaluru</p>
+            <p className="rise text-xs uppercase tracking-[0.3em] text-mute">Hair · Skin · Nails · Bridal</p>
             <h1
               id="hero-title"
               className="rise rise-1 mt-6 text-[clamp(2.1rem,4.2vw,3.8rem)] font-light uppercase leading-[1.15] tracking-[0.02em] text-charcoal"
             >
-              Where hair
+              Welcome to
               <br />
-              becomes art
+              tressart salon
             </h1>
             <Link
               href="/services"

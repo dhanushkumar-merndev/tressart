@@ -23,11 +23,45 @@ const details = [
   },
 ];
 
+function HeroCopy({ titleId }: { titleId: string }) {
+  return (
+    <>
+      <p className="rise text-xs uppercase tracking-[0.3em] text-mute">Hair · Skin · Nails · Bridal</p>
+      <h1
+        id={titleId}
+        className="rise rise-1 mt-6 text-[clamp(2.1rem,4.2vw,3.8rem)] font-light uppercase leading-[1.15] tracking-[0.02em] text-charcoal"
+      >
+        Welcome to
+        <br />
+        tressart salon
+      </h1>
+      <p className="rise rise-2 mt-6 max-w-md leading-relaxed text-mute">
+        A L&apos;Oréal Professionnel flagship salon on Harlur Road, Bengaluru — for women and men.
+      </p>
+      <div className="rise rise-3 mt-9 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-xs uppercase tracking-[0.3em] text-charcoal">
+        <Link href="/services" className="inline-flex items-center gap-2">
+          <span className="link-line">Explore our services</span> <ArrowRight className="size-4" />
+        </Link>
+        <a href={site.phone.href} className="inline-flex items-center gap-2">
+          <span className="link-line">Call {site.phone.display}</span>
+        </a>
+      </div>
+    </>
+  );
+}
+
 export default function HomePage() {
   return (
     <div className="relative">
-      {/* Backdrop + portrait stay pinned while the hero copy and salon details scroll over it */}
-      <div aria-hidden="true" className="sticky top-0 z-0 h-[100svh] overflow-hidden bg-[#f5f5f5]">
+      {/* One fixed layer — backdrop, portrait and (on mobile) the hero copy — that the salon details
+          scroll over. Fixed (not sticky) so the copy never jitters while the page scrolls on phones. */}
+      <div className="fixed inset-0 z-0 overflow-hidden bg-[#f5f5f5]">
+        <section
+          aria-labelledby="hero-title-mobile"
+          className="relative z-10 flex flex-col items-center px-5 pt-[calc(var(--header-h)+3rem)] text-center md:hidden"
+        >
+          <HeroCopy titleId="hero-title-mobile" />
+        </section>
         <div className="absolute inset-x-0 bottom-0 top-[45%] md:inset-y-0 md:left-auto md:right-0 md:top-[var(--header-h)] md:w-[62%] lg:w-[58%]">
           <Image
             src="/images/tressart-hero-portrait-hd.png"
@@ -41,33 +75,16 @@ export default function HomePage() {
         </div>
       </div>
 
-      <section
-        aria-labelledby="hero-title"
-        className="relative z-10 -mt-[100svh] h-[100svh] pt-[var(--header-h)]"
-      >
-        <div className="flex h-full flex-col items-center px-5 pt-12 text-center md:mr-[46%] md:justify-center md:pt-0 lg:mr-[42%]">
-          <p className="rise text-xs uppercase tracking-[0.3em] text-mute">Hair · Skin · Nails · Bridal</p>
-          <h1
-            id="hero-title"
-            className="rise rise-1 mt-6 text-[clamp(2.1rem,4.2vw,3.8rem)] font-light uppercase leading-[1.15] tracking-[0.02em] text-charcoal"
-          >
-            Welcome to
-            <br />
-            tressart salon
-          </h1>
-          <p className="rise rise-2 mt-6 max-w-md leading-relaxed text-mute">
-            A L&apos;Oréal Professionnel flagship salon on Harlur Road, Bengaluru — for women and men.
-          </p>
-          <div className="rise rise-3 mt-9 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-xs uppercase tracking-[0.3em] text-charcoal">
-            <Link href="/services" className="inline-flex items-center gap-2">
-              <span className="link-line">Explore our services</span> <ArrowRight className="size-4" />
-            </Link>
-            <a href={site.phone.href} className="inline-flex items-center gap-2">
-              <span className="link-line">Call {site.phone.display}</span>
-            </a>
-          </div>
-        </div>
-      </section>
+      {/* Holds a screen of scroll space above the salon details. On desktop it also carries the copy,
+          which scrolls away while the portrait stays put. */}
+      <div className="pointer-events-none relative z-10 h-[100svh] pt-[var(--header-h)]">
+        <section
+          aria-labelledby="hero-title"
+          className="pointer-events-auto hidden h-full flex-col items-center justify-center px-5 text-center md:mr-[46%] md:flex lg:mr-[42%]"
+        >
+          <HeroCopy titleId="hero-title" />
+        </section>
+      </div>
 
       {/* Salon details — a short scroll below the hero */}
       <section

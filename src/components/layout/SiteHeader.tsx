@@ -99,7 +99,7 @@ export function SiteHeader() {
         aria-label="Site menu"
         inert={!open}
         data-lenis-prevent
-        className={`fixed inset-y-0 left-0 z-[70] flex w-full flex-col overflow-y-auto border-r border-ink/10 bg-studio transition-transform duration-500 ease-[var(--ease-silk)] sm:w-[440px] lg:w-[33vw] lg:min-w-[440px] ${
+        className={`fixed inset-y-0 left-0 z-[70] flex w-full flex-col overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-r border-ink/10 bg-studio transition-transform duration-500 ease-[var(--ease-silk)] sm:w-[440px] lg:w-[33vw] lg:min-w-[440px] ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >

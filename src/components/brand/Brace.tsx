@@ -34,29 +34,73 @@ export function Brace({ side, className }: BraceProps) {
  */
 export function BraceFrame({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [state, setState] = useState<"static" | "closed" | "open">("static");
+  const [state, setState] = useState<"static" | "closed" | "open" | "done">("static");
 
   useEffect(() => {
     const el = ref.current;
     if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     setState("closed");
+    let timer: ReturnType<typeof setTimeout> | undefined;
     // Opens once it is well in view; resets only when fully off screen, so it replays every time.
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (entry.intersectionRatio >= 0.35) setState("open");
-        else if (!entry.isIntersecting) setState("closed");
+        if (entry.intersectionRatio >= 0.35) {
+          if (timer) return;
+          setState("open");
+          // After the braces have parted (0.3s delay + 1.1s), fade them out.
+          timer = setTimeout(() => setState("done"), 1400);
+        } else if (!entry.isIntersecting) {
+          clearTimeout(timer);
+          timer = undefined;
+          setState("closed");
+        }
       },
       { threshold: [0, 0.35] },
     );
     io.observe(el);
-    return () => io.disconnect();
+    return () => {
+      io.disconnect();
+      clearTimeout(timer);
+    };
   }, []);
 
   return (
-    <div ref={ref} data-braces={state} className={`brace-frame relative px-[8%] text-[#707173] ${className}`}>
-      <Brace side="left" className="brace brace-left absolute -top-[4%] h-[108%] w-auto" />
+    <div
+      ref={ref}
+      data-braces={state}
+      className={`brace-frame brace-frame--image relative px-[2.404%] text-[#707173] ${className}`}
+    >
+      <Brace side="left" className="brace brace-left absolute -top-[4%] z-10 h-[108%] w-auto" />
       <div className="brace-content">{children}</div>
-      <Brace side="right" className="brace brace-right absolute -top-[4%] h-[108%] w-auto" />
+      <Brace side="right" className="brace brace-right absolute -top-[4%] z-10 h-[108%] w-auto" />
     </div>
+  );
+}
+
+/**
+ * A line of text between small logo braces. Each time `play` turns on, the braces start closed,
+ * part to reveal the text, then fade away; `delay` (seconds) staggers a list of them.
+ */
+export function BraceText({
+  children,
+  play,
+  delay = 0,
+  className = "",
+}: {
+  children: React.ReactNode;
+  play: boolean;
+  delay?: number;
+  className?: string;
+}) {
+  return (
+    <span
+      data-braces={play ? "open" : "closed"}
+      style={{ "--brace-delay": `${delay}s`, "--brace-closed": "50%" } as React.CSSProperties}
+      className={`brace-frame relative inline-block px-[0.4em] ${className}`}
+    >
+      <Brace side="left" className="brace brace-left absolute -top-[4%] h-[108%] w-auto text-[#707173]" />
+      <span className="brace-content block">{children}</span>
+      <Brace side="right" className="brace brace-right absolute -top-[4%] h-[108%] w-auto text-[#707173]" />
+    </span>
   );
 }

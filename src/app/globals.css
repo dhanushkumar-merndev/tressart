@@ -295,7 +295,8 @@ body {
 
 }
 
-/* Logo braces that part to reveal an image, then fade (see BraceFrame) */
+/* Logo braces that part to reveal an image or a line of text, then fade (see BraceFrame, BraceText).
+   --brace-delay staggers the start; --brace-closed is how much of each side stays hidden while closed. */
 .brace-frame .brace-left {
   left: 0;
 }
@@ -313,22 +314,55 @@ body {
   right: 50%;
   transform: translateX(100%);
 }
-/* Closed, the braces' upright strokes sit just either side of the centre, so a sliver of image shows
-   between them; the photo's edges then track those strokes as the braces part. */
+/* For images, the braces' upright strokes sit just either side of the centre while closed, so a
+   sliver shows between them; the image edges then track those strokes as the braces part. */
 .brace-frame[data-braces="closed"] .brace-content {
-  clip-path: inset(0 40.6% 0 40.6%);
+  clip-path: inset(0 var(--brace-closed, 40.6%) 0 var(--brace-closed, 40.6%));
 }
 .brace-frame[data-braces="open"] .brace {
   opacity: 0;
   transition:
-    left 1.1s var(--ease-silk) 0.3s,
-    right 1.1s var(--ease-silk) 0.3s,
-    transform 1.1s var(--ease-silk) 0.3s,
-    opacity 0.8s ease 1.6s;
+    left 1.1s var(--ease-silk) calc(0.3s + var(--brace-delay, 0s)),
+    right 1.1s var(--ease-silk) calc(0.3s + var(--brace-delay, 0s)),
+    transform 1.1s var(--ease-silk) calc(0.3s + var(--brace-delay, 0s)),
+    opacity 0.8s ease calc(1.6s + var(--brace-delay, 0s));
 }
 .brace-frame[data-braces="open"] .brace-content {
   clip-path: inset(0 0 0 0);
+  transition: clip-path 1.1s var(--ease-silk) calc(0.3s + var(--brace-delay, 0s));
+}
+/* Image frames: the photo is clipped to the braces' outer outline (traced from the logo), so it runs
+   right up to the strokes with no gaps while they part; once open, the braces fade and the clip
+   relaxes to straight edges. States: closed → open → done (set by BraceFrame). */
+.brace-frame--image[data-braces="closed"] .brace-content {
+  clip-path: polygon(38.97% 0.00%, 38.14% 2.50%, 37.78% 5.00%, 37.63% 7.50%, 37.56% 10.00%, 37.51% 12.50%, 37.51% 15.00%, 37.51% 17.50%, 37.48% 20.00%, 37.48% 22.50%, 37.46% 25.00%, 37.43% 27.50%, 37.38% 30.00%, 37.33% 32.50%, 37.21% 35.00%, 36.98% 37.50%, 36.63% 40.00%, 36.07% 42.50%, 35.09% 45.00%, 32.97% 47.50%, 31.16% 50.00%, 33.20% 52.50%, 35.14% 55.00%, 36.10% 57.50%, 36.70% 60.00%, 37.05% 62.50%, 37.21% 65.00%, 37.31% 67.50%, 37.38% 70.00%, 37.41% 72.50%, 37.43% 75.00%, 37.46% 77.50%, 37.48% 80.00%, 37.48% 82.50%, 37.48% 85.00%, 37.51% 87.50%, 37.56% 90.00%, 37.61% 92.50%, 37.76% 95.00%, 38.21% 97.50%, 39.07% 100.00%, 60.93% 100.00%, 61.81% 97.50%, 62.24% 95.00%, 62.34% 92.50%, 62.39% 90.00%, 62.44% 87.50%, 62.47% 85.00%, 62.49% 82.50%, 62.52% 80.00%, 62.54% 77.50%, 62.57% 75.00%, 62.59% 72.50%, 62.62% 70.00%, 62.69% 67.50%, 62.77% 65.00%, 62.92% 62.50%, 63.27% 60.00%, 63.85% 57.50%, 64.81% 55.00%, 66.80% 52.50%, 68.86% 50.00%, 67.03% 47.50%, 64.91% 45.00%, 63.90% 42.50%, 63.30% 40.00%, 62.92% 37.50%, 62.77% 35.00%, 62.67% 32.50%, 62.64% 30.00%, 62.59% 27.50%, 62.57% 25.00%, 62.54% 22.50%, 62.52% 20.00%, 62.47% 17.50%, 62.44% 15.00%, 62.42% 12.50%, 62.39% 10.00%, 62.34% 7.50%, 62.27% 5.00%, 61.84% 2.50%, 60.96% 0.00%);
+}
+.brace-frame--image[data-braces="open"] .brace-content {
+  clip-path: polygon(5.38% 0.00%, 4.55% 2.50%, 4.20% 5.00%, 4.05% 7.50%, 3.97% 10.00%, 3.92% 12.50%, 3.92% 15.00%, 3.92% 17.50%, 3.90% 20.00%, 3.90% 22.50%, 3.87% 25.00%, 3.85% 27.50%, 3.80% 30.00%, 3.75% 32.50%, 3.62% 35.00%, 3.39% 37.50%, 3.04% 40.00%, 2.49% 42.50%, 1.50% 45.00%, -0.61% 47.50%, -2.42% 50.00%, -0.38% 52.50%, 1.55% 55.00%, 2.51% 57.50%, 3.12% 60.00%, 3.47% 62.50%, 3.62% 65.00%, 3.72% 67.50%, 3.80% 70.00%, 3.82% 72.50%, 3.85% 75.00%, 3.87% 77.50%, 3.90% 80.00%, 3.90% 82.50%, 3.90% 85.00%, 3.92% 87.50%, 3.97% 90.00%, 4.02% 92.50%, 4.17% 95.00%, 4.63% 97.50%, 5.48% 100.00%, 94.52% 100.00%, 95.40% 97.50%, 95.83% 95.00%, 95.93% 92.50%, 95.98% 90.00%, 96.03% 87.50%, 96.05% 85.00%, 96.08% 82.50%, 96.10% 80.00%, 96.13% 77.50%, 96.15% 75.00%, 96.18% 72.50%, 96.20% 70.00%, 96.28% 67.50%, 96.35% 65.00%, 96.51% 62.50%, 96.86% 60.00%, 97.44% 57.50%, 98.39% 55.00%, 100.38% 52.50%, 102.45% 50.00%, 100.61% 47.50%, 98.50% 45.00%, 97.49% 42.50%, 96.88% 40.00%, 96.51% 37.50%, 96.35% 35.00%, 96.25% 32.50%, 96.23% 30.00%, 96.18% 27.50%, 96.15% 25.00%, 96.13% 22.50%, 96.10% 20.00%, 96.05% 17.50%, 96.03% 15.00%, 96.00% 12.50%, 95.98% 10.00%, 95.93% 7.50%, 95.85% 5.00%, 95.42% 2.50%, 94.54% 0.00%);
   transition: clip-path 1.1s var(--ease-silk) 0.3s;
+}
+.brace-frame--image[data-braces="done"] .brace-content {
+  clip-path: polygon(3.72% 0.00%, 3.72% 2.50%, 3.72% 5.00%, 3.72% 7.50%, 3.72% 10.00%, 3.72% 12.50%, 3.72% 15.00%, 3.72% 17.50%, 3.72% 20.00%, 3.72% 22.50%, 3.72% 25.00%, 3.72% 27.50%, 3.72% 30.00%, 3.72% 32.50%, 3.72% 35.00%, 3.72% 37.50%, 3.72% 40.00%, 3.72% 42.50%, 3.72% 45.00%, 3.72% 47.50%, 3.72% 50.00%, 3.72% 52.50%, 3.72% 55.00%, 3.72% 57.50%, 3.72% 60.00%, 3.72% 62.50%, 3.72% 65.00%, 3.72% 67.50%, 3.72% 70.00%, 3.72% 72.50%, 3.72% 75.00%, 3.72% 77.50%, 3.72% 80.00%, 3.72% 82.50%, 3.72% 85.00%, 3.72% 87.50%, 3.72% 90.00%, 3.72% 92.50%, 3.72% 95.00%, 3.72% 97.50%, 3.72% 100.00%, 96.23% 100.00%, 96.23% 97.50%, 96.23% 95.00%, 96.23% 92.50%, 96.23% 90.00%, 96.23% 87.50%, 96.23% 85.00%, 96.23% 82.50%, 96.23% 80.00%, 96.23% 77.50%, 96.23% 75.00%, 96.23% 72.50%, 96.23% 70.00%, 96.23% 67.50%, 96.23% 65.00%, 96.23% 62.50%, 96.23% 60.00%, 96.23% 57.50%, 96.23% 55.00%, 96.23% 52.50%, 96.23% 50.00%, 96.23% 47.50%, 96.23% 45.00%, 96.23% 42.50%, 96.23% 40.00%, 96.23% 37.50%, 96.23% 35.00%, 96.23% 32.50%, 96.23% 30.00%, 96.23% 27.50%, 96.23% 25.00%, 96.23% 22.50%, 96.23% 20.00%, 96.23% 17.50%, 96.23% 15.00%, 96.23% 12.50%, 96.23% 10.00%, 96.23% 7.50%, 96.23% 5.00%, 96.23% 2.50%, 96.23% 0.00%);
+  transition: clip-path 0.8s ease;
+}
+.brace-frame.brace-frame--image[data-braces="open"] .brace {
+  opacity: 1;
+  transition:
+    left 1.1s var(--ease-silk) 0.3s,
+    right 1.1s var(--ease-silk) 0.3s,
+    transform 1.1s var(--ease-silk) 0.3s;
+}
+.brace-frame--image[data-braces="done"] .brace {
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .brace-frame .brace {
+    display: none;
+  }
+  .brace-frame .brace-content {
+    clip-path: none !important;
+  }
 }
 
 /* Accordion marker */

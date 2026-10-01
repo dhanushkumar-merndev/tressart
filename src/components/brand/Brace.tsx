@@ -28,40 +28,28 @@ export function Brace({ side, className }: BraceProps) {
 
 /**
  * Frames its child (a box with a fixed aspect ratio) between a pair of logo braces. When it scrolls
- * into view the braces start closed in the middle, part to reveal the child, then fade away —
- * every time it comes back into view.
+ * into view the braces start closed in the middle and part to reveal the child — every time it
+ * comes back into view.
  * Without JavaScript, or with reduced motion, the child simply shows.
  */
 export function BraceFrame({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [state, setState] = useState<"static" | "closed" | "open" | "done">("static");
+  const [state, setState] = useState<"static" | "closed" | "open">("static");
 
   useEffect(() => {
     const el = ref.current;
     if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     setState("closed");
-    let timer: ReturnType<typeof setTimeout> | undefined;
     // Opens once it is well in view; resets only when fully off screen, so it replays every time.
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (entry.intersectionRatio >= 0.35) {
-          if (timer) return;
-          setState("open");
-          // After the braces have parted (0.3s delay + 1.1s), fade them out.
-          timer = setTimeout(() => setState("done"), 1400);
-        } else if (!entry.isIntersecting) {
-          clearTimeout(timer);
-          timer = undefined;
-          setState("closed");
-        }
+        if (entry.intersectionRatio >= 0.35) setState("open");
+        else if (!entry.isIntersecting) setState("closed");
       },
       { threshold: [0, 0.35] },
     );
     io.observe(el);
-    return () => {
-      io.disconnect();
-      clearTimeout(timer);
-    };
+    return () => io.disconnect();
   }, []);
 
   return (

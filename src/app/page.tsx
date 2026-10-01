@@ -64,7 +64,7 @@ export default function HomePage() {
         </section>
         <div className="absolute inset-x-0 bottom-0 top-[58%] md:inset-y-0 md:left-auto md:right-0 md:top-[var(--header-h)] md:w-[54%] lg:w-[50%]">
           <Image
-            src="/images/tressart-hero-waves.png"
+            src="/images/tressart-hero-waves-hd.png"
             alt=""
             fill
             priority

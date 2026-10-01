@@ -243,8 +243,8 @@ export const services: ServiceCategory[] = [
     metaDescription:
       "Manicures, pedicures, spa pedicures, gel polish and nail art at tressart salon, Ambalipura, Harlur Road, Bengaluru.",
     scene: "fan",
-    image: "/images/services/service-nails.jpg",
-    imageAlt: "Manicure and gel polish nail care at tressart salon",
+    image: "/images/services/service-nail-art.webp",
+    imageAlt: "Glossy black stiletto nail art with rose-gold glitter at tressart salon",
   },
   {
     slug: "mens-grooming",

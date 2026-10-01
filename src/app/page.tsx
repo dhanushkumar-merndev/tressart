@@ -62,7 +62,7 @@ export default function HomePage() {
         >
           <HeroCopy titleId="hero-title-mobile" />
         </section>
-        <div className="relative -mx-[12%] mt-4 min-h-[56svh] flex-1 md:absolute md:mx-0 md:min-h-0 md:inset-y-0 md:left-auto md:right-0 md:top-[var(--header-h)] md:mt-0 md:w-[54%] lg:w-[50%]">
+        <div className="relative -mx-[6%] mt-6 min-h-0 flex-1 md:absolute md:mx-0 md:inset-y-0 md:left-auto md:right-0 md:top-[var(--header-h)] md:mt-0 md:w-[54%] lg:w-[50%]">
           <Image
             src="/images/tressart-hero-waves-hd.png"
             alt=""
@@ -70,7 +70,7 @@ export default function HomePage() {
             priority
             sizes="(max-width: 768px) 100vw, 54vw"
             quality={90}
-            className="object-contain object-top md:object-right-bottom"
+            className="object-cover object-top md:object-contain md:object-right-bottom"
           />
         </div>
       </div>

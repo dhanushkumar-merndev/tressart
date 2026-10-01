@@ -53,16 +53,16 @@ function HeroCopy({ titleId }: { titleId: string }) {
 export default function HomePage() {
   return (
     <div className="relative">
-      {/* One fixed layer — backdrop, portrait and (on mobile) the hero copy — that the salon details
-          scroll over. Fixed (not sticky) so the copy never jitters while the page scrolls on phones. */}
-      <div className="fixed inset-0 z-0 flex flex-col overflow-hidden bg-[#f5f5f5] md:block">
+      {/* On desktop, one fixed layer — backdrop and portrait — that the salon details scroll over.
+          On phones the copy and the whole portrait simply stack in the page flow. */}
+      <div className="relative z-0 overflow-hidden bg-[#f5f5f5] md:fixed md:inset-0">
         <section
           aria-labelledby="hero-title-mobile"
-          className="relative z-10 flex shrink-0 flex-col items-center px-5 pt-[calc(var(--header-h)+2rem)] text-center md:hidden"
+          className="relative z-10 flex flex-col items-center px-5 pt-[calc(var(--header-h)+2rem)] text-center md:hidden"
         >
           <HeroCopy titleId="hero-title-mobile" />
         </section>
-        <div className="relative -mx-[6%] mt-6 min-h-0 flex-1 md:absolute md:mx-0 md:inset-y-0 md:left-auto md:right-0 md:top-[var(--header-h)] md:mt-0 md:w-[54%] lg:w-[50%]">
+        <div className="relative mt-6 aspect-[1081/941] w-full md:absolute md:inset-y-0 md:aspect-auto md:left-auto md:right-0 md:top-[var(--header-h)] md:mt-0 md:w-[54%] lg:w-[50%]">
           <Image
             src="/images/tressart-hero-waves-hd.png"
             alt=""
@@ -70,14 +70,14 @@ export default function HomePage() {
             priority
             sizes="(max-width: 768px) 100vw, 54vw"
             quality={90}
-            className="object-cover object-top md:object-contain md:object-right-bottom"
+            className="object-contain object-bottom md:object-right-bottom"
           />
         </div>
       </div>
 
-      {/* Holds a screen of scroll space above the salon details. On desktop it also carries the copy,
-          which scrolls away while the portrait stays put. */}
-      <div className="pointer-events-none relative z-10 h-[100svh] pt-[var(--header-h)]">
+      {/* Desktop only: a screen of scroll space above the salon details, carrying the copy, which
+          scrolls away while the portrait stays put. */}
+      <div className="pointer-events-none relative z-10 hidden h-[100svh] pt-[var(--header-h)] md:block">
         <section
           aria-labelledby="hero-title"
           className="pointer-events-auto hidden h-full flex-col items-center justify-center px-5 text-center md:mr-[46%] md:flex lg:mr-[42%]"

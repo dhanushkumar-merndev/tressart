@@ -53,7 +53,7 @@ export function BraceFrame({ children, className = "" }: { children: React.React
   }, []);
 
   return (
-    <div ref={ref} data-braces={state} className={`brace-frame relative px-[17%] text-[#707173] ${className}`}>
+    <div ref={ref} data-braces={state} className={`brace-frame relative px-[13.8%] text-[#707173] ${className}`}>
       <Brace side="left" className="brace brace-left absolute -top-[4%] h-[108%] w-auto" />
       <div className="brace-content">{children}</div>
       <Brace side="right" className="brace brace-right absolute -top-[4%] h-[108%] w-auto" />

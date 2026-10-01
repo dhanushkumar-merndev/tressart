@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+
 /**
  * The curly braces from the tressart wordmark, lifted unchanged from
  * /public/brand/tressart-wordmark.svg so they match the logo exactly.
@@ -22,13 +26,37 @@ export function Brace({ side, className }: BraceProps) {
   );
 }
 
-/** Frames its child (a box with a fixed aspect ratio) between a pair of logo braces. */
+/**
+ * Frames its child (a box with a fixed aspect ratio) between a pair of logo braces. When it scrolls
+ * into view the braces start closed in the middle, part to reveal the child, then fade away.
+ * Without JavaScript, or with reduced motion, the child simply shows.
+ */
 export function BraceFrame({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [state, setState] = useState<"static" | "closed" | "open">("static");
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    setState("closed");
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setState("open");
+          io.disconnect();
+        }
+      },
+      { threshold: 0.35 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <div className={`relative px-[17%] text-[#707173] ${className}`}>
-      <Brace side="left" className="absolute -top-[4%] left-0 h-[108%] w-auto" />
-      {children}
-      <Brace side="right" className="absolute -top-[4%] right-0 h-[108%] w-auto" />
+    <div ref={ref} data-braces={state} className={`brace-frame relative px-[17%] text-[#707173] ${className}`}>
+      <Brace side="left" className="brace brace-left absolute -top-[4%] h-[108%] w-auto" />
+      <div className="brace-content">{children}</div>
+      <Brace side="right" className="brace brace-right absolute -top-[4%] h-[108%] w-auto" />
     </div>
   );
 }

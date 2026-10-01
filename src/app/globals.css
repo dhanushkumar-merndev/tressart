@@ -295,6 +295,40 @@ body {
 
 }
 
+/* Logo braces that part to reveal an image, then fade (see BraceFrame) */
+.brace-frame .brace-left {
+  left: 0;
+}
+.brace-frame .brace-right {
+  right: 0;
+}
+.brace-frame[data-braces="static"] .brace {
+  display: none;
+}
+.brace-frame[data-braces="closed"] .brace-left {
+  left: 50%;
+  transform: translateX(-100%);
+}
+.brace-frame[data-braces="closed"] .brace-right {
+  right: 50%;
+  transform: translateX(100%);
+}
+.brace-frame[data-braces="closed"] .brace-content {
+  clip-path: inset(0 50% 0 50%);
+}
+.brace-frame[data-braces="open"] .brace {
+  opacity: 0;
+  transition:
+    left 1.1s var(--ease-silk) 0.3s,
+    right 1.1s var(--ease-silk) 0.3s,
+    transform 1.1s var(--ease-silk) 0.3s,
+    opacity 0.8s ease 1.6s;
+}
+.brace-frame[data-braces="open"] .brace-content {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 1.1s var(--ease-silk) 0.3s;
+}
+
 /* Accordion marker */
 details > summary {
   list-style: none;

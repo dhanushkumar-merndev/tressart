@@ -55,14 +55,14 @@ export default function HomePage() {
     <div className="relative">
       {/* One fixed layer — backdrop, portrait and (on mobile) the hero copy — that the salon details
           scroll over. Fixed (not sticky) so the copy never jitters while the page scrolls on phones. */}
-      <div className="fixed inset-0 z-0 overflow-hidden bg-[#f5f5f5]">
+      <div className="fixed inset-0 z-0 flex flex-col overflow-hidden bg-[#f5f5f5] md:block">
         <section
           aria-labelledby="hero-title-mobile"
-          className="relative z-10 flex flex-col items-center px-5 pt-[calc(var(--header-h)+3rem)] text-center md:hidden"
+          className="relative z-10 flex shrink-0 flex-col items-center px-5 pt-[calc(var(--header-h)+2rem)] text-center md:hidden"
         >
           <HeroCopy titleId="hero-title-mobile" />
         </section>
-        <div className="absolute inset-x-0 bottom-0 top-[58%] md:inset-y-0 md:left-auto md:right-0 md:top-[var(--header-h)] md:w-[54%] lg:w-[50%]">
+        <div className="relative mt-5 min-h-0 flex-1 md:absolute md:inset-y-0 md:left-auto md:right-0 md:top-[var(--header-h)] md:mt-0 md:w-[54%] lg:w-[50%]">
           <Image
             src="/images/tressart-hero-waves-hd.png"
             alt=""

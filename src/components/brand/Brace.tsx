@@ -28,7 +28,8 @@ export function Brace({ side, className }: BraceProps) {
 
 /**
  * Frames its child (a box with a fixed aspect ratio) between a pair of logo braces. When it scrolls
- * into view the braces start closed in the middle, part to reveal the child, then fade away.
+ * into view the braces start closed in the middle, part to reveal the child, then fade away —
+ * every time it comes back into view.
  * Without JavaScript, or with reduced motion, the child simply shows.
  */
 export function BraceFrame({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -39,14 +40,13 @@ export function BraceFrame({ children, className = "" }: { children: React.React
     const el = ref.current;
     if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     setState("closed");
+    // Opens once it is well in view; resets only when fully off screen, so it replays every time.
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setState("open");
-          io.disconnect();
-        }
+        if (entry.intersectionRatio >= 0.35) setState("open");
+        else if (!entry.isIntersecting) setState("closed");
       },
-      { threshold: 0.35 },
+      { threshold: [0, 0.35] },
     );
     io.observe(el);
     return () => io.disconnect();

@@ -313,8 +313,10 @@ body {
   right: 50%;
   transform: translateX(100%);
 }
+/* Closed, the braces' upright strokes sit just either side of the centre, so a sliver of image shows
+   between them; the photo's edges then track those strokes as the braces part. */
 .brace-frame[data-braces="closed"] .brace-content {
-  clip-path: inset(0 50% 0 50%);
+  clip-path: inset(0 40.6% 0 40.6%);
 }
 .brace-frame[data-braces="open"] .brace {
   opacity: 0;

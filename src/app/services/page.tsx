@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { BraceFrame } from "@/components/brand/Brace";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { FaqList } from "@/components/sections/FaqList";
 import { PageHero } from "@/components/sections/PageHero";
@@ -63,16 +64,20 @@ export default function ServicesPage() {
               >
                 <Link
                   href={`/services/${s.slug}`}
-                  className={`group relative block aspect-[4/3] overflow-hidden bg-soft ${flip ? "md:order-2" : ""}`}
+                  className={`group block ${flip ? "md:order-2" : ""}`}
                   aria-label={s.title}
                 >
-                  <Image
-                    src={s.image}
-                    alt={s.imageAlt}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    className="object-cover transition-transform duration-[1.2s] ease-[var(--ease-silk)] group-hover:scale-105"
-                  />
+                  <BraceFrame>
+                    <div className="relative aspect-[4/3] overflow-hidden bg-soft">
+                      <Image
+                        src={s.image}
+                        alt={s.imageAlt}
+                        fill
+                        sizes="(max-width: 768px) 75vw, 37vw"
+                        className="object-cover transition-transform duration-[1.2s] ease-[var(--ease-silk)] group-hover:scale-105"
+                      />
+                    </div>
+                  </BraceFrame>
                 </Link>
                 <div className={flip ? "md:order-1" : ""}>
                   <span className="text-xs tracking-[0.24em] text-grey">{s.number}</span>

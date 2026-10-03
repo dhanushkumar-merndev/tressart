@@ -56,7 +56,9 @@ export function BraceFrame({ children, className = "" }: { children: React.React
     <div
       ref={ref}
       data-braces={state}
-      className={`brace-frame brace-frame--image relative px-[2.404%] text-[#707173] ${className}`}
+      // The side padding is a brace's width plus a small gap, so the braces stand clear of the photo.
+      style={{ "--brace-closed": "50%" } as React.CSSProperties}
+      className={`brace-frame brace-frame--image relative px-[16%] text-[#707173] ${className}`}
     >
       <Brace side="left" className="brace brace-left absolute -top-[4%] z-10 h-[108%] w-auto" />
       <div className="brace-content">{children}</div>

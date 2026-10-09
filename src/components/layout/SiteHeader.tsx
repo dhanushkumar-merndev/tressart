@@ -4,7 +4,6 @@ import { useLenis } from "lenis/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { BraceText } from "@/components/brand/Brace";
 import { Logo } from "@/components/brand/Logo";
 import { ArrowUpRight, ChevronDown, Close, Pin } from "@/components/ui/icons";
 import { services } from "@/lib/services";
@@ -156,7 +155,7 @@ export function SiteHeader() {
                     >
                       <div className="overflow-hidden">
                         <ul className="border-t border-ink/10 bg-soft/20 py-2">
-                          {services.map((s, i) => {
+                          {services.map((s) => {
                             const isServiceActive = pathname === `/services/${s.slug}`;
                             return (
                               <li key={s.slug}>
@@ -168,9 +167,7 @@ export function SiteHeader() {
                                   } md:px-10 lg:justify-end lg:pr-[max(2.5rem,calc(33vw-360px))]`}
                                 >
                                   <span className="w-[280px] pl-4 text-sm tracking-[0.04em]">
-                                    <BraceText play={open && servicesOpen} delay={0.2 + i * 0.08} className="-ml-[0.4em]">
-                                      {s.title}
-                                    </BraceText>
+                                    {s.title}
                                   </span>
                                 </Link>
                               </li>

@@ -295,7 +295,7 @@ body {
 
 }
 
-/* Logo braces that part to reveal an image or a line of text, then fade (see BraceFrame, BraceText).
+/* Logo braces that part to reveal an image (see BraceFrame).
    --brace-delay staggers the start; --brace-closed is how much of each side stays hidden while closed. */
 .brace-frame .brace-left {
   left: 0;

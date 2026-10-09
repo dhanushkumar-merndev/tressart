@@ -66,31 +66,3 @@ export function BraceFrame({ children, className = "" }: { children: React.React
     </div>
   );
 }
-
-/**
- * A line of text between small logo braces. Each time `play` turns on, the braces start closed,
- * part to reveal the text, then fade away; `delay` (seconds) staggers a list of them.
- */
-export function BraceText({
-  children,
-  play,
-  delay = 0,
-  className = "",
-}: {
-  children: React.ReactNode;
-  play: boolean;
-  delay?: number;
-  className?: string;
-}) {
-  return (
-    <span
-      data-braces={play ? "open" : "closed"}
-      style={{ "--brace-delay": `${delay}s`, "--brace-closed": "50%" } as React.CSSProperties}
-      className={`brace-frame relative inline-block px-[0.4em] ${className}`}
-    >
-      <Brace side="left" className="brace brace-left absolute -top-[4%] h-[108%] w-auto text-[#707173]" />
-      <span className="brace-content block">{children}</span>
-      <Brace side="right" className="brace brace-right absolute -top-[4%] h-[108%] w-auto text-[#707173]" />
-    </span>
-  );
-}
